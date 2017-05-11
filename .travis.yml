@@ -1,0 +1,68 @@
+language: cpp
+sudo: false
+
+linux64_addons:
+    addons: &linux64
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        - kalakris-cmake
+        packages:
+        - g++-4.8
+        - cmake
+
+linux32_addons:
+    addons: &linux32
+      apt:
+        sources:
+        - ubuntu-toolchain-r-test
+        - kalakris-cmake
+        packages:
+        - g++-4.8
+        - cmake
+        - g++-4.8-multilib
+        - linux-libc-dev:i386
+        - libc6-dev-i386
+
+matrix:
+  fast_finish: true
+  include:
+    - os: linux
+      compiler: clang
+      addons: *linux64
+    - os: linux
+      compiler: gcc
+      addons: *linux64
+    - os: linux
+      compiler: gcc
+      env: CMAKE_EXTRA="-DHAVE_LIBM=/lib32/libm.so.6 -DCMAKE_CXX_FLAGS=-m32"
+      addons: *linux32
+    - os: osx
+      compiler: clang
+    - os: osx
+      compiler: gcc
+
+install:
+  # Setting environement
+  - cd $TRAVIS_BUILD_DIR
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+        export CXX=g++-4.8
+    fi
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+        brew update
+        if test "${CC}" == "gcc"; then
+            brew rm gcc
+            brew install gcc@5
+            export CXX=g++-5
+        fi
+    fi
+
+script:
+  - cd $TRAVIS_BUILD_DIR
+  - mkdir build
+  - cd build
+  - cmake $CMAKE_ARGS $CMAKE_EXTRA ..
+  - make
+  - ctest --output-on-failure
