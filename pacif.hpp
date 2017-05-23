@@ -39,6 +39,30 @@ using string_t = std::string;
 using real_t = double;
 using vec_t = std::vector<value>;
 
+namespace parsing {
+    using it = std::string::const_iterator;
+
+    inline bool is_ordinary_char(char c) {
+        return c > 32 && c < 127 && c != '"' && c != '#' && c != '$' &&
+               c != '\'' && c != ';' && c != '_' && c != '[' && c != ']';
+    }
+
+    inline bool is_non_blank_char(char c) {
+        return c > 32 && c < 127;
+    }
+
+    inline bool is_tag_name(it begin, it end) {
+        if (end - begin < 2) return false;
+        if (begin[0] != '_') return false;
+        auto result = is_non_blank_char(*(begin++));
+        while (begin != end) {
+            result = result && is_non_blank_char(*begin);
+            begin++;
+        }
+        return result;
+    }
+}
+
 struct error: public std::runtime_error {
     explicit error(std::string message): std::runtime_error(std::move(message)) {}
     error(const error&) = default;
