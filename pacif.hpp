@@ -37,7 +37,6 @@ namespace pacif {
 class value;
 using string_t = std::string;
 using real_t = double;
-using map_t = std::map<std::string, value>;
 using vec_t = std::vector<value>;
 
 struct error: public std::runtime_error {
@@ -55,17 +54,15 @@ public:
         missing,
         string,
         real,
-        map,
         vec,
     };
 
-    explicit value(): kind_(kind::missing) {}
+    value(): kind_(kind::missing) {}
     explicit value(string_t string): kind_(kind::string), string_(std::move(string)) {}
     explicit value(real_t real): kind_(kind::real), real_(real) {}
-    explicit value(map_t map): kind_(kind::map), map_(std::move(map)) {}
     explicit value(vec_t vec): kind_(kind::vec), vec_(std::move(vec)) {}
 
-    value(const value& other): value(0.0) {
+    value(const value& other): value() {
         *this = other;
     }
 
@@ -84,14 +81,11 @@ public:
         case kind::real:
             new (&this->real_) real_t(other.real_);
             break;
-        case kind::map:
-            new (&this->map_) map_t(other.map_);
-            break;
         }
         return *this;
     }
 
-    value(value&& other): value(0.0) {
+    value(value&& other): value() {
         *this = std::move(other);
     }
 
@@ -110,9 +104,6 @@ public:
         case kind::real:
             new (&this->real_) real_t(std::move(other.real_));
             break;
-        case kind::map:
-            new (&this->map_) map_t(std::move(other.map_));
-            break;
         }
         return *this;
     }
@@ -124,9 +115,6 @@ public:
             break;
         case kind::vec:
             this->vec_.~vec_t();
-            break;
-        case kind::map:
-            this->map_.~map_t();
             break;
         case kind::real:
             break; // nothing to do
@@ -151,14 +139,9 @@ public:
         return this->kind_ == kind::real;
     }
 
-    bool is_map() const {
-        return this->kind_ == kind::map;
-    }
-
     kind get_kind() const {
         return this->kind_;
     }
-
 
     const string_t& as_string() const {
         if (this->kind_ == kind::string) {
@@ -176,14 +159,6 @@ public:
         }
     }
 
-    const map_t& as_map() const {
-        if (this->kind_ == kind::map) {
-            return this->map_;
-        } else {
-            throw error("This is not a map value");
-        }
-    }
-
     const vec_t& as_vec() const {
         if (this->kind_ == kind::vec) {
             return this->vec_;
@@ -198,7 +173,6 @@ private:
         string_t string_;
         real_t real_;
         vec_t vec_;
-        map_t map_;
     };
 };
 

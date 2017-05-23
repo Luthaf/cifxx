@@ -10,7 +10,6 @@ TEST_CASE("CIF values", "[]") {
 
         CHECK_THROWS_AS(missing.as_real(), pacif::error);
         CHECK_THROWS_AS(missing.as_string(), pacif::error);
-        CHECK_THROWS_AS(missing.as_map(), pacif::error);
         CHECK_THROWS_AS(missing.as_vec(), pacif::error);
     }
 
@@ -30,7 +29,6 @@ TEST_CASE("CIF values", "[]") {
         CHECK(real.get_kind() == pacif::value::kind::real);
 
         CHECK_THROWS_AS(real.as_string(), pacif::error);
-        CHECK_THROWS_AS(real.as_map(), pacif::error);
         CHECK_THROWS_AS(real.as_vec(), pacif::error);
     }
 
@@ -42,25 +40,9 @@ TEST_CASE("CIF values", "[]") {
         CHECK(string.get_kind() == pacif::value::kind::string);
 
         CHECK_THROWS_AS(string.as_real(), pacif::error);
-        CHECK_THROWS_AS(string.as_map(), pacif::error);
         CHECK_THROWS_AS(string.as_vec(), pacif::error);
     }
 
-    SECTION("Map") {
-        auto map = pacif::value(pacif::map_t {
-            {"first", pacif::value("foobar")},
-            {"second", pacif::value(22)},
-        });
-        REQUIRE(map.is_map());
-        CHECK(map.as_map().find("first")->second.as_string() == "foobar");
-        CHECK(map.as_map().find("second")->second.as_real() == 22);
-
-        CHECK(map.get_kind() == pacif::value::kind::map);
-
-        CHECK_THROWS_AS(map.as_string(), pacif::error);
-        CHECK_THROWS_AS(map.as_real(), pacif::error);
-        CHECK_THROWS_AS(map.as_vec(), pacif::error);
-    }
 
     SECTION("Vec") {
         auto vec = pacif::value(pacif::vec_t{pacif::value("foobar"), pacif::value(22)});
@@ -72,6 +54,5 @@ TEST_CASE("CIF values", "[]") {
 
         CHECK_THROWS_AS(vec.as_string(), pacif::error);
         CHECK_THROWS_AS(vec.as_real(), pacif::error);
-        CHECK_THROWS_AS(vec.as_map(), pacif::error);
     }
 }
