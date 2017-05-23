@@ -200,6 +200,47 @@ private:
     };
 };
 
+
+class data final {
+public:
+    using iterator = std::map<std::string, value>::iterator;
+    using const_iterator = std::map<std::string, value>::const_iterator;
+
+    data(std::string name): name_(std::move(name)), data_() {}
+    data(const data&) = default;
+    data(data&&) = default;
+    data& operator=(const data&) = default;
+    data& operator=(data&&) = default;
+
+    const std::string& name() const {
+        return name_;
+    }
+
+    const_iterator find(const std::string& key) const {
+        return data_.find(key);
+    }
+
+    template<class T>
+    std::pair<iterator, bool> insert(std::string key, T data) {
+        if (!parsing::is_tag_name(key.begin(), key.end())) {
+            throw error(key + " is not a valid data tag name");
+        }
+        return data_.emplace(std::move(key), value(std::move(data)));
+    }
+
+    const_iterator begin() const {
+        return data_.begin();
+    }
+
+    const_iterator end() const {
+        return data_.end();
+    }
+
+private:
+    std::string name_;
+    std::map<std::string, value> data_;
+};
+
 }
 
 #endif
