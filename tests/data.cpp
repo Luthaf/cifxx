@@ -1,7 +1,7 @@
 #include "catch/catch.hpp"
 #include "pacif.hpp"
 
-TEST_CASE("CIF data blocks") {
+TEST_CASE("data class") {
     auto data = pacif::data("this_is_data");
 
     CHECK(data.find("_foo") == data.end());

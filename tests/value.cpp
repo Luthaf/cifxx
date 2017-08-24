@@ -1,7 +1,7 @@
 #include "catch/catch.hpp"
 #include "pacif.hpp"
 
-TEST_CASE("CIF values", "[]") {
+TEST_CASE("value class") {
     SECTION("Missing") {
         auto missing = pacif::value();
         REQUIRE(missing.is_missing());
