@@ -23,15 +23,32 @@
 // IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 // OF SUCH DAMAGE.
 
-#ifndef PACIF_HPP
-#define PACIF_HPP
+#ifndef PACIF_TYPES_HPP
+#define PACIF_TYPES_HPP
 
-#include "pacif/types.hpp"
+#include <string>
+#include <vector>
+#include <stdexcept>
 
-#include "pacif/token.hpp"
-#include "pacif/parser.hpp"
+namespace pacif {
 
-#include "pacif/value.hpp"
-#include "pacif/data.hpp"
+class value;
+
+/// String type used for string values
+using string_t = std::string;
+/// Floating point type used for real values
+using real_t = double;
+/// Integer type used for integer values
+using integer_t = int64_t;
+/// Vector type used for vector values
+using vec_t = std::vector<value>;
+
+/// Exception class for all errors
+class error: public std::runtime_error {
+public:
+    explicit error(std::string message): std::runtime_error(std::move(message)) {}
+};
+
+}
 
 #endif

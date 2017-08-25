@@ -1,5 +1,5 @@
 #include "catch/catch.hpp"
-#include "pacif.hpp"
+#include "pacif/parser.hpp"
 
 TEST_CASE("basic values parsing") {
     SECTION("digit") {

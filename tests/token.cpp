@@ -1,5 +1,5 @@
 #include "catch/catch.hpp"
-#include "pacif.hpp"
+#include "pacif/token.hpp"
 
 using namespace pacif::parsing;
 

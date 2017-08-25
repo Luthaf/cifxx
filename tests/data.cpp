@@ -1,5 +1,5 @@
 #include "catch/catch.hpp"
-#include "pacif.hpp"
+#include "pacif/data.hpp"
 
 TEST_CASE("data class") {
     auto data = pacif::data("this_is_data");

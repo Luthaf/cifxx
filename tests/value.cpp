@@ -1,5 +1,5 @@
 #include "catch/catch.hpp"
-#include "pacif.hpp"
+#include "pacif/value.hpp"
 
 TEST_CASE("value class") {
     SECTION("Missing") {
@@ -17,10 +17,6 @@ TEST_CASE("value class") {
         auto real = pacif::value(42.0);
         REQUIRE(real.is_real());
         CHECK(real.as_real() == 42.0);
-
-        real = pacif::value(42.0f);
-        REQUIRE(real.is_real());
-        CHECK(real.as_real() == static_cast<pacif::real_t>(42.0f));
 
         real = pacif::value(42);
         REQUIRE(real.is_real());
