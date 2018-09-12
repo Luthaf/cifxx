@@ -39,6 +39,7 @@ public:
     /// Available kinds of value
     enum Kind {
         /// A missing value
+        // TODO: should missing and invalid values be different?
         Missing,
         /// A numeric value, represented as a floating point number
         Number,

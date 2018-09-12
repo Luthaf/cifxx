@@ -1,0 +1,14 @@
+data_tags
+
+# ignoring comments
+_string value
+_real 3.25(2)
+_integer 42
+_long_string
+; test here
+; for a long string
+;
+
+_other_line
+
+25

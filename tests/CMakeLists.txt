@@ -18,3 +18,5 @@ file(GLOB all_test_files
 foreach(test_file IN LISTS all_test_files)
     pacif_test(${test_file})
 endforeach(test_file)
+
+target_compile_definitions(parser PRIVATE "-DDATADIR=\"${CMAKE_CURRENT_SOURCE_DIR}/data/\"")

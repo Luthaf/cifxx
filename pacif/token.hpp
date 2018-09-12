@@ -215,7 +215,7 @@ public:
         if (kind_ == String || kind_ == Data || kind_ == Save || kind_ == Tag) {
             return string_;
         } else {
-            throw error("tried to access string data on a non-string token");
+            throw error("tried to access string data on a non-string token " + print());
         }
     }
 
@@ -224,7 +224,7 @@ public:
         if (kind_ == Tag) {
             return string_;
         } else {
-            throw error("tried to access tag data on a non-tag token");
+            throw error("tried to access tag data on a non-tag token " + print());
         }
     }
 
@@ -233,7 +233,7 @@ public:
         if (kind_ == Number) {
             return number_;
         } else {
-            throw error("tried to access real data on a non-real token");
+            throw error("tried to access real data on a non-real token " + print());
         }
     }
 
@@ -261,6 +261,7 @@ public:
         case QuestionMark:
             return "?";
         }
+        throw error("unreachable");
     }
 
 private:
