@@ -1,7 +1,7 @@
 #include "catch/catch.hpp"
 #include "pacif/token.hpp"
 
-using namespace pacif::parsing;
+using namespace pacif;
 
 TEST_CASE("Token class") {
     SECTION("literals") {

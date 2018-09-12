@@ -8,7 +8,7 @@ TEST_CASE("basic values parsing") {
         };
 
         for (auto c: DIGITS) {
-            CHECK(pacif::parsing::is_digit(c));
+            CHECK(pacif::is_digit(c));
         }
     }
 
@@ -24,9 +24,9 @@ TEST_CASE("basic values parsing") {
         };
 
         for (auto c: ORDINARY_CHARS) {
-            CHECK(pacif::parsing::is_ordinary_char(c));
-            CHECK(pacif::parsing::is_non_blank_char(c));
-            CHECK_FALSE(pacif::parsing::is_whitespace(c));
+            CHECK(pacif::is_ordinary_char(c));
+            CHECK(pacif::is_non_blank_char(c));
+            CHECK_FALSE(pacif::is_whitespace(c));
         }
     }
 
@@ -43,8 +43,8 @@ TEST_CASE("basic values parsing") {
         };
 
         for (auto c: NON_BLANK_CHARS) {
-            CHECK(pacif::parsing::is_non_blank_char(c));
-            CHECK_FALSE(pacif::parsing::is_whitespace(c));
+            CHECK(pacif::is_non_blank_char(c));
+            CHECK_FALSE(pacif::is_whitespace(c));
         }
     }
 
@@ -57,7 +57,7 @@ TEST_CASE("basic values parsing") {
         };
 
         for (auto& tag: TAGS) {
-            CHECK(pacif::parsing::is_tag_name(tag));
+            CHECK(pacif::is_tag_name(tag));
         }
 
         std::vector<std::string> NOT_TAGS = {
@@ -68,13 +68,13 @@ TEST_CASE("basic values parsing") {
         };
 
         for (auto& tag: NOT_TAGS) {
-            CHECK_FALSE(pacif::parsing::is_tag_name(tag));
+            CHECK_FALSE(pacif::is_tag_name(tag));
         }
     }
 }
 
 TEST_CASE("tokenizer") {
-    using namespace pacif::parsing;
+    using namespace pacif;
 
     SECTION("keywords") {
         auto token = parser("loop_").next();

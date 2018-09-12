@@ -69,7 +69,7 @@ public:
     /// is pointing to the newly inserted data.
     template<class T>
     std::pair<iterator, bool> insert(std::string key, T val) {
-        if (!parsing::is_tag_name(key)) {
+        if (!is_tag_name(key)) {
             throw error(key + " is not a valid data tag name");
         }
         return data_.emplace(std::move(key), value(std::move(val)));
