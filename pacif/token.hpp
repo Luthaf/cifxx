@@ -118,6 +118,12 @@ public:
         return token(String, value);
     }
 
+    /// Create a new token representing a tag with the given `name`
+    static token tag(string_t name) {
+        assert(is_tag_name(name));
+        return token(Tag, name);
+    }
+
     /// The copy constructor for tokens
     token(const token& other): token(Eof) {
         *this = other;
@@ -218,7 +224,7 @@ public:
         if (kind_ == Tag) {
             return string_;
         } else {
-            throw error("tried to access string data on a non-string token");
+            throw error("tried to access tag data on a non-tag token");
         }
     }
 
@@ -269,9 +275,6 @@ private:
     /// Constructor for tokens with string data attached
     token(Kind kind, string_t string): kind_(kind), string_(std::move(string)) {
         assert(kind == String || kind == Data || kind == Save || kind == Tag);
-        if (is_tag_name(string_)) {
-            kind_ = Tag;
-        }
     }
 
     /// Constructor for `Real` tokens

@@ -127,8 +127,9 @@ public:
                 } else {
                     return token_for_value(std::move(content));
                 }
+            } else {
+                return token_for_value(std::move(content));
             }
-            return token_for_value(std::move(content));
         }
     }
 
@@ -253,6 +254,10 @@ private:
             return token::question_mark();
         } else if (content == ".") {
             return token::dot();
+        }
+
+        if (!content.empty() && content[0] == '_') {
+            return token::tag(content);
         }
 
         std::string number = content;

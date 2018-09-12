@@ -67,7 +67,7 @@ TEST_CASE("Token class") {
     }
 
     SECTION("tags") {
-        auto tok = token::string("_foo");
+        auto tok = token::tag("_foo");
         CHECK(tok.kind() == token::Tag);
         CHECK(tok.as_string() == "_foo");
         CHECK(tok.as_tag() == "_foo");
