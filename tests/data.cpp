@@ -1,5 +1,6 @@
 #include "catch/catch.hpp"
 #include "pacif/data.hpp"
+using namespace pacif;
 
 TEST_CASE("data class") {
     auto data = pacif::data("this_is_data");
@@ -16,10 +17,10 @@ TEST_CASE("data class") {
     CHECK(data.find("_string")->second.is_string());
     CHECK(data.find("_string")->second.as_string() == "some more data");
 
-    data.insert("_vec", pacif::vec_t{pacif::value("here"), pacif::value(22)});
-    CHECK(data.find("_vec") != data.end());
-    CHECK(data.find("_vec")->second.is_vec());
-    auto vec = data.find("_vec")->second.as_vec();
+    data.insert("_vector", vector_t{value("here"), value(22)});
+    CHECK(data.find("_vector") != data.end());
+    CHECK(data.find("_vector")->second.is_vector());
+    auto vec = data.find("_vector")->second.as_vector();
     CHECK(vec[0].is_string());
     CHECK(vec[0].as_string() == "here");
     CHECK(vec[1].is_real());

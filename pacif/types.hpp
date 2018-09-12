@@ -41,7 +41,7 @@ using real_t = double;
 /// Integer type used for integer values
 using integer_t = int64_t;
 /// Vector type used for vector values
-using vec_t = std::vector<value>;
+using vector_t = std::vector<value>;
 
 /// Exception class for all errors
 class error: public std::runtime_error {

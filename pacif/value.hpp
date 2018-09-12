@@ -37,25 +37,31 @@ namespace pacif {
 class value final {
 public:
     /// Available kinds of value
-    enum class kind {
+    enum Kind {
         /// A missing value
-        missing,
-        /// A string value
-        string,
+        Missing,
         /// A real value, represented as a floating point number
-        real,
+        Real,
+        /// A string value
+        String,
         /// A vector of `pacif::value`
-        vec,
+        Vector,
     };
 
-    /// Create a missing value
-    value(): kind_(kind::missing) {}
+    static value missing() {
+        return value();
+    }
+
     /// Create a string value containing `string`
-    explicit value(string_t string): kind_(kind::string), string_(std::move(string)) {}
+    /*implicit*/ value(string_t string): kind_(Kind::String), string_(std::move(string)) {}
+    /*implicit*/ value(char* string): kind_(Kind::String), string_(std::move(string)) {}
+    /*implicit*/ value(const char* string): kind_(Kind::String), string_(std::move(string)) {}
+
     /// Create a real value containing `real`
-    explicit value(real_t real): kind_(kind::real), real_(real) {}
+    /*implicit*/ value(real_t real): kind_(Kind::Real), real_(real) {}
+
     /// Create a vector value containing `vec`
-    explicit value(vec_t vec): kind_(kind::vec), vec_(std::move(vec)) {}
+    /*implicit*/ value(vector_t vector): kind_(Kind::Vector), vector_(std::move(vector)) {}
 
     /// The copy constructor for values
     value(const value& other): value() {
@@ -67,15 +73,15 @@ public:
         this->~value();
         this->kind_ = other.kind_;
         switch (this->kind_) {
-        case kind::missing:
+        case Kind::Missing:
             break; // nothing to do
-        case kind::string:
+        case Kind::String:
             new (&this->string_) string_t(other.string_);
             break;
-        case kind::vec:
-            new (&this->vec_) vec_t(other.vec_);
+        case Kind::Vector:
+            new (&this->vector_) vector_t(other.vector_);
             break;
-        case kind::real:
+        case Kind::Real:
             new (&this->real_) real_t(other.real_);
             break;
         }
@@ -92,15 +98,15 @@ public:
         this->~value();
         this->kind_ = other.kind_;
         switch (this->kind_) {
-        case kind::missing:
+        case Kind::Missing:
             break; // nothing to do
-        case kind::string:
+        case Kind::String:
             new (&this->string_) string_t(std::move(other.string_));
             break;
-        case kind::vec:
-            new (&this->vec_) vec_t(std::move(other.vec_));
+        case Kind::Vector:
+            new (&this->vector_) vector_t(std::move(other.vector_));
             break;
-        case kind::real:
+        case Kind::Real:
             new (&this->real_) real_t(std::move(other.real_));
             break;
         }
@@ -110,41 +116,41 @@ public:
     /// The destructor for values
     ~value() {
         switch (this->kind_) {
-        case kind::string:
+        case Kind::String:
             this->string_.~string_t();
             break;
-        case kind::vec:
-            this->vec_.~vec_t();
+        case Kind::Vector:
+            this->vector_.~vector_t();
             break;
-        case kind::real:
+        case Kind::Real:
             break; // nothing to do
-        case kind::missing:
+        case Kind::Missing:
             break; // nothing to do
         }
     }
 
     /// Check if this value is a missing value
     bool is_missing() const {
-        return this->kind_ == kind::missing;
+        return this->kind_ == Kind::Missing;
     }
 
     /// Check if this value is a string
     bool is_string() const {
-        return this->kind_ == kind::string;
+        return this->kind_ == Kind::String;
     }
 
     /// Check if this value is a vector
-    bool is_vec() const {
-        return this->kind_ == kind::vec;
+    bool is_vector() const {
+        return this->kind_ == Kind::Vector;
     }
 
     /// Check if this value is a real
     bool is_real() const {
-        return this->kind_ == kind::real;
+        return this->kind_ == Kind::Real;
     }
 
     /// Get the kind of this value
-    kind get_kind() const {
+    Kind kind() const {
         return this->kind_;
     }
 
@@ -152,7 +158,7 @@ public:
     ///
     /// @throw if the value is not a string
     const string_t& as_string() const {
-        if (this->kind_ == kind::string) {
+        if (this->kind_ == Kind::String) {
             return this->string_;
         } else {
             throw error("called value::as_string, but this is not a string value");
@@ -163,7 +169,7 @@ public:
     ///
     /// @throw if the value is not a real
     real_t as_real() const {
-        if (this->kind_ == kind::real) {
+        if (this->kind_ == Kind::Real) {
             return this->real_;
         } else {
             throw error("called value::as_real, but this is not a real value");
@@ -173,22 +179,25 @@ public:
     /// Get this value as a vector
     ///
     /// @throw if the value is not a vector
-    const vec_t& as_vec() const {
-        if (this->kind_ == kind::vec) {
-            return this->vec_;
+    const vector_t& as_vector() const {
+        if (this->kind_ == Kind::Vector) {
+            return this->vector_;
         } else {
-            throw error("called value::as_vec, but this is not a vector value");
+            throw error("called value::as_vector, but this is not a vector value");
         }
     }
 
 private:
+    /// Create a missing value
+    value(): kind_(Kind::Missing) {}
+
     /// Kind of the stored value
-    kind kind_;
+    Kind kind_;
     /// Value data storage, as an union
     union {
-        string_t string_;
         real_t real_;
-        vec_t vec_;
+        string_t string_;
+        vector_t vector_;
     };
 };
 

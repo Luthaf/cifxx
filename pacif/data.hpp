@@ -58,21 +58,18 @@ public:
         return data_.find(key);
     }
 
-    /// Insert a data point of type `T` and value `val` in the data block,
-    /// associated with the given `key`. `T` must be convertible to
-    /// `pacif::value`.
+    /// Insert a value in the data block, associated with the given `tag`.
     ///
     /// If there is already a value associated with this key, no insertion is
     /// performed, and the return value is `(iterator, false)` where `iterator`
     /// is pointing to the data entry that prevented insertion. If the insertion
     /// took place, the return value is `(iterator, true)` where `iterator`
     /// is pointing to the newly inserted data.
-    template<class T>
-    std::pair<iterator, bool> insert(std::string key, T val) {
-        if (!is_tag_name(key)) {
-            throw error(key + " is not a valid data tag name");
+    std::pair<iterator, bool> insert(std::string tag, value val) {
+        if (!is_tag_name(tag)) {
+            throw error(tag + " is not a valid data tag name");
         }
-        return data_.emplace(std::move(key), value(std::move(val)));
+        return data_.emplace(std::move(tag), std::move(val));
     }
 
     /// Get the first entry of this data block

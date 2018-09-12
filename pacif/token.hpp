@@ -54,7 +54,7 @@ inline bool is_tag_name(const std::string& name) {
 /// Basic token in CIF grammar
 class token final {
 public:
-    enum kind {
+    enum Kind {
         Eof,            // end of file (end of input)
         Loop,           // `loop_` literal
         Stop,           // `stop_` literal
@@ -212,7 +212,7 @@ public:
     }
 
     /// Get the token kind
-    kind get_kind() const {
+    Kind kind() const {
         return kind_;
     }
 
@@ -255,9 +255,37 @@ public:
         }
     }
 
+    std::string print() const {
+        switch (this->kind_) {
+        case String:
+        case Tag:
+            return this->as_string();
+        case Save:
+            return "save_" + this->as_string();
+        case Data:
+            return "data_" + this->as_string();
+        case Eof:
+            return "<eof>";
+        case Loop:
+            return "loop_";
+        case Stop:
+            return "stop_";
+        case Global:
+            return "global_";
+        case Integer:
+            return std::to_string(integer_);
+        case Real:
+            return std::to_string(real_);
+        case Dot:
+            return ".";
+        case QuestionMark:
+            return "?";
+        }
+    }
+
 private:
     /// Contructor to be used for tokens without data attached
-    explicit token(kind kind): kind_(kind) {
+    explicit token(Kind kind): kind_(kind) {
         assert(kind_ != Real);
         assert(kind_ != Integer);
         assert(kind_ != String);
@@ -266,7 +294,7 @@ private:
     }
 
     /// Constructor for tokens with string data attached
-    token(kind kind, string_t string): kind_(kind), string_(std::move(string)) {
+    token(Kind kind, string_t string): kind_(kind), string_(std::move(string)) {
         assert(kind == String || kind == Data || kind == Save);
         if (is_tag_name(string_)) {
             kind_ = Tag;
@@ -279,7 +307,7 @@ private:
     /// Constructor for `Integer` tokens
     explicit token(integer_t integer): kind_(Integer), integer_(integer) {}
 
-    kind kind_;
+    Kind kind_;
     union {
         integer_t integer_;
         string_t string_;

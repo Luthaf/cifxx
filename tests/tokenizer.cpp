@@ -77,104 +77,104 @@ TEST_CASE("basic values parsing") {
 TEST_CASE("tokenizer") {
     SECTION("symbols") {
         auto token = tokenizer("?").next();
-        CHECK(token.get_kind() == token::QuestionMark);
+        CHECK(token.kind() == token::QuestionMark);
 
         token = tokenizer(".").next();
-        CHECK(token.get_kind() == token::Dot);
+        CHECK(token.kind() == token::Dot);
 
         token = tokenizer("").next();
-        CHECK(token.get_kind() == token::Eof);
+        CHECK(token.kind() == token::Eof);
     }
 
     SECTION("keywords") {
         auto token = tokenizer("loop_").next();
-        CHECK(token.get_kind() == token::Loop);
+        CHECK(token.kind() == token::Loop);
 
         token = tokenizer("stop_").next();
-        CHECK(token.get_kind() == token::Stop);
+        CHECK(token.kind() == token::Stop);
 
         token = tokenizer("global_").next();
-        CHECK(token.get_kind() == token::Global);
+        CHECK(token.kind() == token::Global);
 
         token = tokenizer("data_56").next();
-        CHECK(token.get_kind() == token::Data);
+        CHECK(token.kind() == token::Data);
         CHECK(token.as_string() == "56");
 
         token = tokenizer("save_56").next();
-        CHECK(token.get_kind() == token::Save);
+        CHECK(token.kind() == token::Save);
         CHECK(token.as_string() == "56");
     }
 
     SECTION("strings") {
         auto token = tokenizer("string").next();
-        CHECK(token.get_kind() == token::String);
+        CHECK(token.kind() == token::String);
         CHECK(token.as_string() == "string");
 
         token = tokenizer("'string'").next();
-        CHECK(token.get_kind() == token::String);
+        CHECK(token.kind() == token::String);
         CHECK(token.as_string() == "string");
 
         token = tokenizer("'string' not this one").next();
-        CHECK(token.get_kind() == token::String);
+        CHECK(token.kind() == token::String);
         CHECK(token.as_string() == "string");
 
         token = tokenizer("'string'but this one'").next();
-        CHECK(token.get_kind() == token::String);
+        CHECK(token.kind() == token::String);
         CHECK(token.as_string() == "string'but this one");
 
         token = tokenizer("\"string\"").next();
-        CHECK(token.get_kind() == token::String);
+        CHECK(token.kind() == token::String);
         CHECK(token.as_string() == "string");
 
         token = tokenizer("\"string\" not here").next();
-        CHECK(token.get_kind() == token::String);
+        CHECK(token.kind() == token::String);
         CHECK(token.as_string() == "string");
 
         token = tokenizer("\"string\"but here\"").next();
-        CHECK(token.get_kind() == token::String);
+        CHECK(token.kind() == token::String);
         CHECK(token.as_string() == "string\"but here");
 
         token = tokenizer(";foo bar\n; bar\n;").next();
-        CHECK(token.get_kind() == token::String);
+        CHECK(token.kind() == token::String);
         CHECK(token.as_string() == "foo bar\n bar\n");
 
         token = tokenizer(";foo\n;bar\n;\n").next();
-        CHECK(token.get_kind() == token::String);
+        CHECK(token.kind() == token::String);
         CHECK(token.as_string() == "foo\nbar\n");
 
         token = tokenizer("; foo\n;bar\n;").next();
-        CHECK(token.get_kind() == token::String);
+        CHECK(token.kind() == token::String);
         CHECK(token.as_string() == " foo\nbar\n");
 
         token = tokenizer("_string").next();
-        CHECK(token.get_kind() == token::Tag);
+        CHECK(token.kind() == token::Tag);
         CHECK(token.as_string() == "_string");
         CHECK(token.as_tag() == "_string");
     }
 
     SECTION("integers") {
         auto token = tokenizer("42").next();
-        CHECK(token.get_kind() == token::Integer);
+        CHECK(token.kind() == token::Integer);
         CHECK(token.as_integer() == 42);
 
         token = tokenizer("-33").next();
-        CHECK(token.get_kind() == token::Integer);
+        CHECK(token.kind() == token::Integer);
         CHECK(token.as_integer() == -33);
 
         token = tokenizer("+7833").next();
-        CHECK(token.get_kind() == token::Integer);
+        CHECK(token.kind() == token::Integer);
         CHECK(token.as_integer() == 7833);
 
         token = tokenizer("42(4)").next();
-        CHECK(token.get_kind() == token::Integer);
+        CHECK(token.kind() == token::Integer);
         CHECK(token.as_integer() == 424);
 
         token = tokenizer("42(4)4").next();
-        CHECK(token.get_kind() == token::String);
+        CHECK(token.kind() == token::String);
         CHECK(token.as_string() == "42(4)4");
 
         token = tokenizer("9223372036854775807").next();
-        CHECK(token.get_kind() == token::Integer);
+        CHECK(token.kind() == token::Integer);
         CHECK(token.as_integer() == 9223372036854775807);
 
         CHECK_THROWS_AS(tokenizer("9223372036854775808").next(), pacif::error);
@@ -182,73 +182,73 @@ TEST_CASE("tokenizer") {
 
     SECTION("reals") {
         auto token = tokenizer("42.5").next();
-        CHECK(token.get_kind() == token::Real);
+        CHECK(token.kind() == token::Real);
         CHECK(token.as_real() == 42.5);
 
         token = tokenizer("42.5(3)").next();
-        CHECK(token.get_kind() == token::Real);
+        CHECK(token.kind() == token::Real);
         CHECK(token.as_real() == 42.53);
 
         token = tokenizer("42.").next();
-        CHECK(token.get_kind() == token::Real);
+        CHECK(token.kind() == token::Real);
         CHECK(token.as_real() == 42.);
 
         token = tokenizer(".42").next();
-        CHECK(token.get_kind() == token::Real);
+        CHECK(token.kind() == token::Real);
         CHECK(token.as_real() == .42);
 
 
         token = tokenizer("42e6").next();
-        CHECK(token.get_kind() == token::Real);
+        CHECK(token.kind() == token::Real);
         CHECK(token.as_real() == 42e6);
 
         token = tokenizer("42e-8").next();
-        CHECK(token.get_kind() == token::Real);
+        CHECK(token.kind() == token::Real);
         CHECK(token.as_real() == 42e-8);
 
         token = tokenizer("-25.5").next();
-        CHECK(token.get_kind() == token::Real);
+        CHECK(token.kind() == token::Real);
         CHECK(token.as_real() == -25.5);
 
         token = tokenizer("+67.9").next();
-        CHECK(token.get_kind() == token::Real);
+        CHECK(token.kind() == token::Real);
         CHECK(token.as_real() == +67.9);
     }
 
     SECTION("comments") {
         auto stream = tokenizer("42.5 # comment \t\n     test\n# commment __not_a_tag");
         auto token = stream.next();
-        CHECK(token.get_kind() == token::Real);
+        CHECK(token.kind() == token::Real);
         CHECK(token.as_real() == 42.5);
 
         token = stream.next();
-        CHECK(token.get_kind() == token::String);
+        CHECK(token.kind() == token::String);
         CHECK(token.as_string() == "test");
 
-        CHECK(stream.next().get_kind() == token::Eof);
+        CHECK(stream.next().kind() == token::Eof);
     }
 
     SECTION("multiple tokens") {
         auto stream = tokenizer("42.5 __tag- 'test' data_me");
 
         auto token = stream.next();
-        CHECK(token.get_kind() == token::Real);
+        CHECK(token.kind() == token::Real);
         CHECK(token.as_real() == 42.5);
 
         token = stream.next();
-        CHECK(token.get_kind() == token::Tag);
+        CHECK(token.kind() == token::Tag);
         CHECK(token.as_tag() == "__tag-");
 
         token = stream.next();
-        CHECK(token.get_kind() == token::String);
+        CHECK(token.kind() == token::String);
         CHECK(token.as_string() == "test");
 
         token = stream.next();
-        CHECK(token.get_kind() == token::Data);
+        CHECK(token.kind() == token::Data);
         CHECK(token.as_string() == "me");
 
         // Checking multiple calls to next at the end
-        CHECK(stream.next().get_kind() == token::Eof);
-        CHECK(stream.next().get_kind() == token::Eof);
+        CHECK(stream.next().kind() == token::Eof);
+        CHECK(stream.next().kind() == token::Eof);
     }
 }
