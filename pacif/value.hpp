@@ -40,8 +40,8 @@ public:
     enum Kind {
         /// A missing value
         Missing,
-        /// A real value, represented as a floating point number
-        Real,
+        /// A numeric value, represented as a floating point number
+        Number,
         /// A string value
         String,
         /// A vector of `pacif::value`
@@ -58,7 +58,7 @@ public:
     /*implicit*/ value(const char* string): kind_(Kind::String), string_(std::move(string)) {}
 
     /// Create a real value containing `real`
-    /*implicit*/ value(real_t real): kind_(Kind::Real), real_(real) {}
+    /*implicit*/ value(number_t number): kind_(Kind::Number), number_(number) {}
 
     /// Create a vector value containing `vec`
     /*implicit*/ value(vector_t vector): kind_(Kind::Vector), vector_(std::move(vector)) {}
@@ -81,8 +81,8 @@ public:
         case Kind::Vector:
             new (&this->vector_) vector_t(other.vector_);
             break;
-        case Kind::Real:
-            new (&this->real_) real_t(other.real_);
+        case Kind::Number:
+            new (&this->number_) number_t(other.number_);
             break;
         }
         return *this;
@@ -106,8 +106,8 @@ public:
         case Kind::Vector:
             new (&this->vector_) vector_t(std::move(other.vector_));
             break;
-        case Kind::Real:
-            new (&this->real_) real_t(std::move(other.real_));
+        case Kind::Number:
+            new (&this->number_) number_t(std::move(other.number_));
             break;
         }
         return *this;
@@ -122,7 +122,7 @@ public:
         case Kind::Vector:
             this->vector_.~vector_t();
             break;
-        case Kind::Real:
+        case Kind::Number:
             break; // nothing to do
         case Kind::Missing:
             break; // nothing to do
@@ -144,9 +144,9 @@ public:
         return this->kind_ == Kind::Vector;
     }
 
-    /// Check if this value is a real
-    bool is_real() const {
-        return this->kind_ == Kind::Real;
+    /// Check if this value is a number
+    bool is_number() const {
+        return this->kind_ == Kind::Number;
     }
 
     /// Get the kind of this value
@@ -165,12 +165,12 @@ public:
         }
     }
 
-    /// Get this value as a real
+    /// Get this value as a number
     ///
-    /// @throw if the value is not a real
-    real_t as_real() const {
-        if (this->kind_ == Kind::Real) {
-            return this->real_;
+    /// @throw if the value is not a number
+    number_t as_number() const {
+        if (this->kind_ == Kind::Number) {
+            return this->number_;
         } else {
             throw error("called value::as_real, but this is not a real value");
         }
@@ -195,7 +195,7 @@ private:
     Kind kind_;
     /// Value data storage, as an union
     union {
-        real_t real_;
+        number_t number_;
         string_t string_;
         vector_t vector_;
     };

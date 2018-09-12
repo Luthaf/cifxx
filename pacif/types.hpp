@@ -36,10 +36,8 @@ class value;
 
 /// String type used for string values
 using string_t = std::string;
-/// Floating point type used for real values
-using real_t = double;
-/// Integer type used for integer values
-using integer_t = int64_t;
+/// Floating point type used for numeric values
+using number_t = double;
 /// Vector type used for vector values
 using vector_t = std::vector<value>;
 

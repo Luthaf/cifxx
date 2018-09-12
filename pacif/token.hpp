@@ -60,8 +60,7 @@ public:
         Stop,           // `stop_` literal
         Global,         // `global_` literal
         Tag,            // a tag
-        Integer,        // an integer value
-        Real,           // a floating point value
+        Number,         // a numeric value
         String,         // a string value
         Data,           // data frame header
         Save,           // save frame header
@@ -99,13 +98,8 @@ public:
         return token(Dot);
     }
 
-    /// Create a new token representing an integer value
-    static token integer(integer_t value) {
-        return token(value);
-    }
-
-    /// Create a new token representing a real value
-    static token real(real_t value) {
+    /// Create a new token representing a number value
+    static token number(number_t value) {
         return token(value);
     }
 
@@ -140,11 +134,8 @@ public:
         case Tag:
             new (&this->string_) string_t(other.string_);
             break;
-        case Real:
-            new (&this->real_) real_t(other.real_);
-            break;
-        case Integer:
-            new (&this->integer_) integer_t(other.integer_);
+        case Number:
+            new (&this->number_) number_t(other.number_);
             break;
         case Eof:
         case Loop:
@@ -173,11 +164,8 @@ public:
         case Tag:
             new (&this->string_) string_t(std::move(other.string_));
             break;
-        case Real:
-            new (&this->real_) real_t(std::move(other.real_));
-            break;
-        case Integer:
-            new (&this->integer_) integer_t(std::move(other.integer_));
+        case Number:
+            new (&this->number_) number_t(std::move(other.number_));
             break;
         case Eof:
         case Loop:
@@ -203,8 +191,7 @@ public:
         case Loop:
         case Stop:
         case Global:
-        case Integer:
-        case Real:
+        case Number:
         case Dot:
         case QuestionMark:
             break; // nothing to do
@@ -235,21 +222,10 @@ public:
         }
     }
 
-    /// Get the integer data in this token, if the token has the `Integer`
-    /// kind.
-    integer_t as_integer() const {
-        if (kind_ == Integer) {
-            return integer_;
-        } else {
-            throw error("tried to access integer data on a non-integer token");
-        }
-    }
-
-    /// Get the floating point data in this token, if the token has the
-    /// `Real` kind.
-    real_t as_real() const {
-        if (kind_ == Real) {
-            return real_;
+    /// Get the numeric in this token, if the token has the `Number` kind.
+    number_t as_number() const {
+        if (kind_ == Number) {
+            return number_;
         } else {
             throw error("tried to access real data on a non-real token");
         }
@@ -272,10 +248,8 @@ public:
             return "stop_";
         case Global:
             return "global_";
-        case Integer:
-            return std::to_string(integer_);
-        case Real:
-            return std::to_string(real_);
+        case Number:
+            return std::to_string(number_);
         case Dot:
             return ".";
         case QuestionMark:
@@ -286,8 +260,7 @@ public:
 private:
     /// Contructor to be used for tokens without data attached
     explicit token(Kind kind): kind_(kind) {
-        assert(kind_ != Real);
-        assert(kind_ != Integer);
+        assert(kind_ != Number);
         assert(kind_ != String);
         assert(kind_ != Data);
         assert(kind_ != Save);
@@ -295,23 +268,19 @@ private:
 
     /// Constructor for tokens with string data attached
     token(Kind kind, string_t string): kind_(kind), string_(std::move(string)) {
-        assert(kind == String || kind == Data || kind == Save);
+        assert(kind == String || kind == Data || kind == Save || kind == Tag);
         if (is_tag_name(string_)) {
             kind_ = Tag;
         }
     }
 
     /// Constructor for `Real` tokens
-    explicit token(real_t real): kind_(Real), real_(real) {}
-
-    /// Constructor for `Integer` tokens
-    explicit token(integer_t integer): kind_(Integer), integer_(integer) {}
+    explicit token(number_t number): kind_(Number), number_(number) {}
 
     Kind kind_;
     union {
-        integer_t integer_;
         string_t string_;
-        real_t real_;
+        number_t number_;
     };
 };
 

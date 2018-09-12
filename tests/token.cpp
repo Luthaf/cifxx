@@ -9,68 +9,51 @@ TEST_CASE("Token class") {
         CHECK(tok.kind() == token::Eof);
 
         CHECK_THROWS_AS(tok.as_tag(), pacif::error);
-        CHECK_THROWS_AS(tok.as_real(), pacif::error);
+        CHECK_THROWS_AS(tok.as_number(), pacif::error);
         CHECK_THROWS_AS(tok.as_string(), pacif::error);
-        CHECK_THROWS_AS(tok.as_integer(), pacif::error);
 
         tok = token::loop();
         CHECK(tok.kind() == token::Loop);
 
         CHECK_THROWS_AS(tok.as_tag(), pacif::error);
-        CHECK_THROWS_AS(tok.as_real(), pacif::error);
+        CHECK_THROWS_AS(tok.as_number(), pacif::error);
         CHECK_THROWS_AS(tok.as_string(), pacif::error);
-        CHECK_THROWS_AS(tok.as_integer(), pacif::error);
 
         tok = token::global();
         CHECK(tok.kind() == token::Global);
 
         CHECK_THROWS_AS(tok.as_tag(), pacif::error);
-        CHECK_THROWS_AS(tok.as_real(), pacif::error);
+        CHECK_THROWS_AS(tok.as_number(), pacif::error);
         CHECK_THROWS_AS(tok.as_string(), pacif::error);
-        CHECK_THROWS_AS(tok.as_integer(), pacif::error);
 
         tok = token::stop();
         CHECK(tok.kind() == token::Stop);
 
         CHECK_THROWS_AS(tok.as_tag(), pacif::error);
-        CHECK_THROWS_AS(tok.as_real(), pacif::error);
+        CHECK_THROWS_AS(tok.as_number(), pacif::error);
         CHECK_THROWS_AS(tok.as_string(), pacif::error);
-        CHECK_THROWS_AS(tok.as_integer(), pacif::error);
 
         tok = token::question_mark();
         CHECK(tok.kind() == token::QuestionMark);
 
         CHECK_THROWS_AS(tok.as_tag(), pacif::error);
-        CHECK_THROWS_AS(tok.as_real(), pacif::error);
+        CHECK_THROWS_AS(tok.as_number(), pacif::error);
         CHECK_THROWS_AS(tok.as_string(), pacif::error);
-        CHECK_THROWS_AS(tok.as_integer(), pacif::error);
 
         tok = token::dot();
         CHECK(tok.kind() == token::Dot);
 
         CHECK_THROWS_AS(tok.as_tag(), pacif::error);
-        CHECK_THROWS_AS(tok.as_real(), pacif::error);
-        CHECK_THROWS_AS(tok.as_string(), pacif::error);
-        CHECK_THROWS_AS(tok.as_integer(), pacif::error);
-    }
-
-    SECTION("integers") {
-        auto tok = token::integer(25);
-        CHECK(tok.kind() == token::Integer);
-        CHECK(tok.as_integer() == 25);
-
-        CHECK_THROWS_AS(tok.as_tag(), pacif::error);
-        CHECK_THROWS_AS(tok.as_real(), pacif::error);
+        CHECK_THROWS_AS(tok.as_number(), pacif::error);
         CHECK_THROWS_AS(tok.as_string(), pacif::error);
     }
 
-    SECTION("reals") {
-        auto tok = token::real(25);
-        CHECK(tok.kind() == token::Real);
-        CHECK(tok.as_real() == 25);
+    SECTION("numbers") {
+        auto tok = token::number(25);
+        CHECK(tok.kind() == token::Number);
+        CHECK(tok.as_number() == 25);
 
         CHECK_THROWS_AS(tok.as_tag(), pacif::error);
-        CHECK_THROWS_AS(tok.as_integer(), pacif::error);
         CHECK_THROWS_AS(tok.as_string(), pacif::error);
     }
 
@@ -80,8 +63,7 @@ TEST_CASE("Token class") {
         CHECK(tok.as_string() == "foo");
 
         CHECK_THROWS_AS(tok.as_tag(), pacif::error);
-        CHECK_THROWS_AS(tok.as_real(), pacif::error);
-        CHECK_THROWS_AS(tok.as_integer(), pacif::error);
+        CHECK_THROWS_AS(tok.as_number(), pacif::error);
     }
 
     SECTION("tags") {
@@ -90,8 +72,7 @@ TEST_CASE("Token class") {
         CHECK(tok.as_string() == "_foo");
         CHECK(tok.as_tag() == "_foo");
 
-        CHECK_THROWS_AS(tok.as_real(), pacif::error);
-        CHECK_THROWS_AS(tok.as_integer(), pacif::error);
+        CHECK_THROWS_AS(tok.as_number(), pacif::error);
     }
 
     SECTION("data") {
@@ -100,8 +81,7 @@ TEST_CASE("Token class") {
         CHECK(tok.as_string() == "foo");
 
         CHECK_THROWS_AS(tok.as_tag(), pacif::error);
-        CHECK_THROWS_AS(tok.as_real(), pacif::error);
-        CHECK_THROWS_AS(tok.as_integer(), pacif::error);
+        CHECK_THROWS_AS(tok.as_number(), pacif::error);
     }
 
     SECTION("save") {
@@ -110,7 +90,6 @@ TEST_CASE("Token class") {
         CHECK(tok.as_string() == "foo");
 
         CHECK_THROWS_AS(tok.as_tag(), pacif::error);
-        CHECK_THROWS_AS(tok.as_real(), pacif::error);
-        CHECK_THROWS_AS(tok.as_integer(), pacif::error);
+        CHECK_THROWS_AS(tok.as_number(), pacif::error);
     }
 }

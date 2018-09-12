@@ -264,25 +264,12 @@ private:
             }
         }
 
-        // try to get an integer
-        try {
-            std::size_t processed = 0;
-            integer_t value = std::stoll(number, &processed);
-            if (processed == number.length()) {
-                return token::integer(value);
-            }
-        } catch (const std::invalid_argument&) {
-            // do nothing, this is not an integer
-        } catch (const std::out_of_range&) {
-            throw error("integer value " + content + " is too big for 64-bit integer type");
-        }
-
         // try to get a real
         try {
             std::size_t processed = 0;
-            real_t value = std::stod(number, &processed);
+            number_t value = std::stod(number, &processed);
             if (processed == number.length()) {
-                return token::real(value);
+                return token::number(value);
             }
         } catch (const std::invalid_argument&) {
             // do nothing, this is not a real

@@ -152,74 +152,66 @@ TEST_CASE("tokenizer") {
         CHECK(token.as_tag() == "_string");
     }
 
-    SECTION("integers") {
+    SECTION("numbers") {
         auto token = tokenizer("42").next();
-        CHECK(token.kind() == token::Integer);
-        CHECK(token.as_integer() == 42);
+        CHECK(token.kind() == token::Number);
+        CHECK(token.as_number() == 42);
 
         token = tokenizer("-33").next();
-        CHECK(token.kind() == token::Integer);
-        CHECK(token.as_integer() == -33);
+        CHECK(token.kind() == token::Number);
+        CHECK(token.as_number() == -33);
 
         token = tokenizer("+7833").next();
-        CHECK(token.kind() == token::Integer);
-        CHECK(token.as_integer() == 7833);
+        CHECK(token.kind() == token::Number);
+        CHECK(token.as_number() == 7833);
 
         token = tokenizer("42(4)").next();
-        CHECK(token.kind() == token::Integer);
-        CHECK(token.as_integer() == 424);
+        CHECK(token.kind() == token::Number);
+        CHECK(token.as_number() == 424);
 
         token = tokenizer("42(4)4").next();
         CHECK(token.kind() == token::String);
         CHECK(token.as_string() == "42(4)4");
 
-        token = tokenizer("9223372036854775807").next();
-        CHECK(token.kind() == token::Integer);
-        CHECK(token.as_integer() == 9223372036854775807);
-
-        CHECK_THROWS_AS(tokenizer("9223372036854775808").next(), pacif::error);
-    }
-
-    SECTION("reals") {
-        auto token = tokenizer("42.5").next();
-        CHECK(token.kind() == token::Real);
-        CHECK(token.as_real() == 42.5);
+        token = tokenizer("42.5").next();
+        CHECK(token.kind() == token::Number);
+        CHECK(token.as_number() == 42.5);
 
         token = tokenizer("42.5(3)").next();
-        CHECK(token.kind() == token::Real);
-        CHECK(token.as_real() == 42.53);
+        CHECK(token.kind() == token::Number);
+        CHECK(token.as_number() == 42.53);
 
         token = tokenizer("42.").next();
-        CHECK(token.kind() == token::Real);
-        CHECK(token.as_real() == 42.);
+        CHECK(token.kind() == token::Number);
+        CHECK(token.as_number() == 42.);
 
         token = tokenizer(".42").next();
-        CHECK(token.kind() == token::Real);
-        CHECK(token.as_real() == .42);
+        CHECK(token.kind() == token::Number);
+        CHECK(token.as_number() == .42);
 
 
         token = tokenizer("42e6").next();
-        CHECK(token.kind() == token::Real);
-        CHECK(token.as_real() == 42e6);
+        CHECK(token.kind() == token::Number);
+        CHECK(token.as_number() == 42e6);
 
         token = tokenizer("42e-8").next();
-        CHECK(token.kind() == token::Real);
-        CHECK(token.as_real() == 42e-8);
+        CHECK(token.kind() == token::Number);
+        CHECK(token.as_number() == 42e-8);
 
         token = tokenizer("-25.5").next();
-        CHECK(token.kind() == token::Real);
-        CHECK(token.as_real() == -25.5);
+        CHECK(token.kind() == token::Number);
+        CHECK(token.as_number() == -25.5);
 
         token = tokenizer("+67.9").next();
-        CHECK(token.kind() == token::Real);
-        CHECK(token.as_real() == +67.9);
+        CHECK(token.kind() == token::Number);
+        CHECK(token.as_number() == +67.9);
     }
 
     SECTION("comments") {
         auto stream = tokenizer("42.5 # comment \t\n     test\n# commment __not_a_tag");
         auto token = stream.next();
-        CHECK(token.kind() == token::Real);
-        CHECK(token.as_real() == 42.5);
+        CHECK(token.kind() == token::Number);
+        CHECK(token.as_number() == 42.5);
 
         token = stream.next();
         CHECK(token.kind() == token::String);
@@ -232,8 +224,8 @@ TEST_CASE("tokenizer") {
         auto stream = tokenizer("42.5 __tag- 'test' data_me");
 
         auto token = stream.next();
-        CHECK(token.kind() == token::Real);
-        CHECK(token.as_real() == 42.5);
+        CHECK(token.kind() == token::Number);
+        CHECK(token.as_number() == 42.5);
 
         token = stream.next();
         CHECK(token.kind() == token::Tag);
