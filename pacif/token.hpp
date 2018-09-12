@@ -31,19 +31,42 @@
 
 namespace pacif {
 
+/// Check if a given char is a non whitespace printable char
+inline bool is_non_blank_char(char c) {
+    return c > 32 && c < 127;
+}
+
+/// Check if `name` is a CIF tag name.
+///
+///     <tag_name> = '_' {<non_blank_char>}+
+inline bool is_tag_name(const std::string& name) {
+    if (name.length() < 2) return false;
+    if (name[0] != '_') return false;
+    auto begin = name.begin();
+    auto result = is_non_blank_char(*(begin++));
+    while (begin != name.end()) {
+        result = result && is_non_blank_char(*begin);
+        begin++;
+    }
+    return result;
+}
+
 /// Basic token in CIF grammar
 class token final {
 public:
     enum kind {
-        Eof,        // end of file (end of input)
-        Loop,       // `loop_` literal
-        Stop,       // `stop_` literal
-        Global,     // `global_` literal
-        Integer,    // an integer value
-        Real,       // a floating point value
-        String,     // a string value
-        Data,       // data frame header
-        Save,       // save frame header
+        Eof,            // end of file (end of input)
+        Loop,           // `loop_` literal
+        Stop,           // `stop_` literal
+        Global,         // `global_` literal
+        Tag,            // a tag
+        Integer,        // an integer value
+        Real,           // a floating point value
+        String,         // a string value
+        Data,           // data frame header
+        Save,           // save frame header
+        QuestionMark,   // `?` literal
+        Dot,            // `.` literal
     };
 
     /// Create a new token representing the end of file
@@ -64,6 +87,16 @@ public:
     /// Create a new token representing the `global_` literal
     static token global() {
         return token(Global);
+    }
+
+    /// Create a new token representing the `?` literal
+    static token question_mark() {
+        return token(QuestionMark);
+    }
+
+    /// Create a new token representing the `.` literal
+    static token dot() {
+        return token(Dot);
     }
 
     /// Create a new token representing an integer value
@@ -104,6 +137,7 @@ public:
         case String:
         case Save:
         case Data:
+        case Tag:
             new (&this->string_) string_t(other.string_);
             break;
         case Real:
@@ -116,6 +150,8 @@ public:
         case Loop:
         case Stop:
         case Global:
+        case Dot:
+        case QuestionMark:
             break; // nothing to do
         }
         return *this;
@@ -134,6 +170,7 @@ public:
         case String:
         case Save:
         case Data:
+        case Tag:
             new (&this->string_) string_t(std::move(other.string_));
             break;
         case Real:
@@ -146,6 +183,8 @@ public:
         case Loop:
         case Stop:
         case Global:
+        case Dot:
+        case QuestionMark:
             break; // nothing to do
         }
         return *this;
@@ -157,6 +196,7 @@ public:
         case String:
         case Save:
         case Data:
+        case Tag:
             this->string_.~string_t();
             break;
         case Eof:
@@ -165,6 +205,8 @@ public:
         case Global:
         case Integer:
         case Real:
+        case Dot:
+        case QuestionMark:
             break; // nothing to do
         }
     }
@@ -175,9 +217,18 @@ public:
     }
 
     /// Get the string data in this token, if the token has the `String`,
-    /// `Data` or `Tag` kind.
+    /// `Data`, `Save` or `Tag` kind.
     const string_t& as_string() const {
-        if (kind_ == String || kind_ == Data || kind_ == Save) {
+        if (kind_ == String || kind_ == Data || kind_ == Save || kind_ == Tag) {
+            return string_;
+        } else {
+            throw error("tried to access string data on a non-string token");
+        }
+    }
+
+    /// Get the tag name of this token, if the token has the `Tag` kind.
+    const string_t& as_tag() const {
+        if (kind_ == Tag) {
             return string_;
         } else {
             throw error("tried to access string data on a non-string token");
@@ -217,6 +268,9 @@ private:
     /// Constructor for tokens with string data attached
     token(kind kind, string_t string): kind_(kind), string_(std::move(string)) {
         assert(kind == String || kind == Data || kind == Save);
+        if (is_tag_name(string_)) {
+            kind_ = Tag;
+        }
     }
 
     /// Constructor for `Real` tokens

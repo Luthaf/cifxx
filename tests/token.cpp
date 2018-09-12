@@ -8,6 +8,7 @@ TEST_CASE("Token class") {
         auto tok = token::eof();
         CHECK(tok.get_kind() == token::Eof);
 
+        CHECK_THROWS_AS(tok.as_tag(), pacif::error);
         CHECK_THROWS_AS(tok.as_real(), pacif::error);
         CHECK_THROWS_AS(tok.as_string(), pacif::error);
         CHECK_THROWS_AS(tok.as_integer(), pacif::error);
@@ -15,6 +16,7 @@ TEST_CASE("Token class") {
         tok = token::loop();
         CHECK(tok.get_kind() == token::Loop);
 
+        CHECK_THROWS_AS(tok.as_tag(), pacif::error);
         CHECK_THROWS_AS(tok.as_real(), pacif::error);
         CHECK_THROWS_AS(tok.as_string(), pacif::error);
         CHECK_THROWS_AS(tok.as_integer(), pacif::error);
@@ -22,6 +24,7 @@ TEST_CASE("Token class") {
         tok = token::global();
         CHECK(tok.get_kind() == token::Global);
 
+        CHECK_THROWS_AS(tok.as_tag(), pacif::error);
         CHECK_THROWS_AS(tok.as_real(), pacif::error);
         CHECK_THROWS_AS(tok.as_string(), pacif::error);
         CHECK_THROWS_AS(tok.as_integer(), pacif::error);
@@ -29,6 +32,23 @@ TEST_CASE("Token class") {
         tok = token::stop();
         CHECK(tok.get_kind() == token::Stop);
 
+        CHECK_THROWS_AS(tok.as_tag(), pacif::error);
+        CHECK_THROWS_AS(tok.as_real(), pacif::error);
+        CHECK_THROWS_AS(tok.as_string(), pacif::error);
+        CHECK_THROWS_AS(tok.as_integer(), pacif::error);
+
+        tok = token::question_mark();
+        CHECK(tok.get_kind() == token::QuestionMark);
+
+        CHECK_THROWS_AS(tok.as_tag(), pacif::error);
+        CHECK_THROWS_AS(tok.as_real(), pacif::error);
+        CHECK_THROWS_AS(tok.as_string(), pacif::error);
+        CHECK_THROWS_AS(tok.as_integer(), pacif::error);
+
+        tok = token::dot();
+        CHECK(tok.get_kind() == token::Dot);
+
+        CHECK_THROWS_AS(tok.as_tag(), pacif::error);
         CHECK_THROWS_AS(tok.as_real(), pacif::error);
         CHECK_THROWS_AS(tok.as_string(), pacif::error);
         CHECK_THROWS_AS(tok.as_integer(), pacif::error);
@@ -39,6 +59,7 @@ TEST_CASE("Token class") {
         CHECK(tok.get_kind() == token::Integer);
         CHECK(tok.as_integer() == 25);
 
+        CHECK_THROWS_AS(tok.as_tag(), pacif::error);
         CHECK_THROWS_AS(tok.as_real(), pacif::error);
         CHECK_THROWS_AS(tok.as_string(), pacif::error);
     }
@@ -48,15 +69,26 @@ TEST_CASE("Token class") {
         CHECK(tok.get_kind() == token::Real);
         CHECK(tok.as_real() == 25);
 
+        CHECK_THROWS_AS(tok.as_tag(), pacif::error);
         CHECK_THROWS_AS(tok.as_integer(), pacif::error);
         CHECK_THROWS_AS(tok.as_string(), pacif::error);
     }
-
 
     SECTION("strings") {
         auto tok = token::string("foo");
         CHECK(tok.get_kind() == token::String);
         CHECK(tok.as_string() == "foo");
+
+        CHECK_THROWS_AS(tok.as_tag(), pacif::error);
+        CHECK_THROWS_AS(tok.as_real(), pacif::error);
+        CHECK_THROWS_AS(tok.as_integer(), pacif::error);
+    }
+
+    SECTION("tags") {
+        auto tok = token::string("_foo");
+        CHECK(tok.get_kind() == token::Tag);
+        CHECK(tok.as_string() == "_foo");
+        CHECK(tok.as_tag() == "_foo");
 
         CHECK_THROWS_AS(tok.as_real(), pacif::error);
         CHECK_THROWS_AS(tok.as_integer(), pacif::error);
@@ -67,6 +99,7 @@ TEST_CASE("Token class") {
         CHECK(tok.get_kind() == token::Data);
         CHECK(tok.as_string() == "foo");
 
+        CHECK_THROWS_AS(tok.as_tag(), pacif::error);
         CHECK_THROWS_AS(tok.as_real(), pacif::error);
         CHECK_THROWS_AS(tok.as_integer(), pacif::error);
     }
@@ -76,6 +109,7 @@ TEST_CASE("Token class") {
         CHECK(tok.get_kind() == token::Save);
         CHECK(tok.as_string() == "foo");
 
+        CHECK_THROWS_AS(tok.as_tag(), pacif::error);
         CHECK_THROWS_AS(tok.as_real(), pacif::error);
         CHECK_THROWS_AS(tok.as_integer(), pacif::error);
     }

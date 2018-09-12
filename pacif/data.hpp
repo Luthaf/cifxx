@@ -28,7 +28,7 @@
 
 #include <map>
 #include "value.hpp"
-#include "parser.hpp"
+#include "token.hpp"
 
 namespace pacif {
 
