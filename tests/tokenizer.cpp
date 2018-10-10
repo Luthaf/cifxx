@@ -169,6 +169,10 @@ TEST_CASE("tokenizer") {
         CHECK(token.kind() == token::Number);
         CHECK(token.as_number() == 424);
 
+        token = tokenizer("42(43)").next();
+        CHECK(token.kind() == token::Number);
+        CHECK(token.as_number() == 4243);
+
         token = tokenizer("42(4)4").next();
         CHECK(token.kind() == token::String);
         CHECK(token.as_string() == "42(4)4");
@@ -181,6 +185,10 @@ TEST_CASE("tokenizer") {
         CHECK(token.kind() == token::Number);
         CHECK(token.as_number() == 42.53);
 
+        token = tokenizer("42.5(37)").next();
+        CHECK(token.kind() == token::Number);
+        CHECK(token.as_number() == 42.537);
+
         token = tokenizer("42.").next();
         CHECK(token.kind() == token::Number);
         CHECK(token.as_number() == 42.);
@@ -188,7 +196,6 @@ TEST_CASE("tokenizer") {
         token = tokenizer(".42").next();
         CHECK(token.kind() == token::Number);
         CHECK(token.as_number() == .42);
-
 
         token = tokenizer("42e6").next();
         CHECK(token.kind() == token::Number);

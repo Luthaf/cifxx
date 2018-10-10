@@ -264,8 +264,9 @@ private:
         // check if we have the `number(precision)` form
         if (content.length() >= 4) {
             auto last = content.length() - 1;
-            if (content[last] == ')' && is_digit(content[last - 1]) && content[last - 2] == '(') {
-                number = content.substr(0, last - 2) + content[last - 1];
+            auto lparen = content.rfind('(');
+            if (lparen != std::string::npos && content[last] == ')') {
+                number = content.substr(0, lparen) + content.substr(lparen + 1, last - lparen - 1);
             }
         }
 
