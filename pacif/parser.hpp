@@ -133,6 +133,7 @@ private:
             } else {
                 break;
             }
+            current++;
         }
 
         if (current % values.size() != 0) {

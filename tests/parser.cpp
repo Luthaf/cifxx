@@ -33,6 +33,18 @@ TEST_CASE("Parse files") {
         CHECK(get(blocks[0], "_integer").as_number() == 42);
         CHECK(get(blocks[0], "_long_string").as_string() == " test here\n for a long string\n");
         CHECK(get(blocks[0], "_other_line").as_number() == 25);
+
+        auto looped = get(blocks[0], "_looped").as_vector();
+        CHECK(looped.size() == 3);
+        CHECK(looped[0].as_number() == 1);
+        CHECK(looped[1].as_number() == 2);
+        CHECK(looped[2].as_number() == 3);
+
+        auto changing_type = get(blocks[0], "_changing_type").as_vector();
+        CHECK(changing_type.size() == 3);
+        CHECK(changing_type[0].as_string() == "fe");
+        CHECK(changing_type[1].as_number() == 4);
+        CHECK(changing_type[2].as_string() == "zn");
     }
 
     SECTION("multiple") {

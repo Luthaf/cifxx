@@ -12,3 +12,10 @@ _long_string
 _other_line
 
 25
+
+loop_
+_looped
+_changing_type
+1 fe
+2 4
+3 zn
