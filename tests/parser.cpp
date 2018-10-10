@@ -59,3 +59,58 @@ TEST_CASE("Parse files") {
         CHECK(get(blocks[1], "_tag2").as_number() == 3);
     }
 }
+
+TEST_CASE("Actual CIF files") {
+    SECTION("Crystalographic CIF file") {
+        std::ifstream file(DATADIR "it023_br.cif");
+        auto blocks = parser(file).parse();
+        REQUIRE(blocks.size() == 1);
+
+        auto block = blocks[0];
+        CHECK(block.name() == "IT023_BR_phase_");
+        CHECK(get(block, "_cell_length_a").as_number() == 17.08321);
+        CHECK(get(block, "_cell_length_b").as_number() == 17.0832);
+
+        auto atom_site_fract_x = get(block, "_atom_site_fract_x").as_vector();
+        CHECK(atom_site_fract_x.size() == 7);
+        CHECK(atom_site_fract_x[0].as_number() == 0.5);
+        CHECK(atom_site_fract_x[1].as_number() == 0.37563);
+        CHECK(atom_site_fract_x[2].as_number() == 0.36452);
+    }
+
+    SECTION("From the COD database") {
+        std::ifstream file(DATADIR "1544173.cif");
+        auto blocks = parser(file).parse();
+        REQUIRE(blocks.size() == 1);
+
+        auto block = blocks[0];
+        CHECK(block.name() == "1544173");
+        CHECK(get(block, "_chemical_formula_sum").as_string() == "C20 H28 O2");
+        CHECK(get(block, "_cell_length_b").as_number() == 11.50306);
+
+        auto atom_site_fract_x = get(block, "_atom_site_fract_x").as_vector();
+        CHECK(atom_site_fract_x.size() == 50);
+        CHECK(atom_site_fract_x[0].as_number() == 0.2069115);
+        CHECK(atom_site_fract_x[22].as_number() == 0.4594);
+    }
+
+    SECTION("From the PDBX database") {
+        std::ifstream file(DATADIR "4hhb.cif");
+        auto blocks = parser(file).parse();
+        REQUIRE(blocks.size() == 1);
+
+        auto block = blocks[0];
+        CHECK(block.name() == "4HHB");
+        CHECK(get(block, "_audit_conform.dict_name").as_string() == "mmcif_pdbx.dic");
+
+        CHECK(get(block, "_cell.length_a").as_number() == 63.150);
+        CHECK(get(block, "_cell.Z_PDB").as_number() == 4);
+        CHECK(get(block, "_cell.pdbx_unique_axis").is_missing());
+
+
+        auto x = get(block, "_atom_site.Cartn_x").as_vector();
+        CHECK(x.size() == 4779);
+        CHECK(x[22].as_number() == 15.048);
+        CHECK(x[150].as_number() == 22.302);
+    }
+}
