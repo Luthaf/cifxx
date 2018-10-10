@@ -173,7 +173,7 @@ public:
         if (this->kind_ == Kind::Number) {
             return this->number_;
         } else {
-            throw error("called value::as_real, but this is not a real value");
+            throw error("called value::as_number, but this is not a number value");
         }
     }
 
