@@ -1,6 +1,0 @@
-# Reference to save variables is allowed in STAR but forbidden in CIF
-
-data_savref
-
-_tag1 2.0
-_tag2 $reference

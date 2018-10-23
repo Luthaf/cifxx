@@ -79,15 +79,6 @@ TEST_CASE("Invalid CIF files") {
 
     parser = pacif::parser(std::ifstream(DATADIR "bad/save.cif"));
     CHECK_THROWS_AS(parser.parse(), pacif::error);
-
-    parser = pacif::parser(std::ifstream(DATADIR "bad/save-ref.cif"));
-    CHECK_THROWS_AS(parser.parse(), pacif::error);
-
-    parser = pacif::parser(std::ifstream(DATADIR "bad/left-braket.cif"));
-    CHECK_THROWS_AS(parser.parse(), pacif::error);
-
-    parser = pacif::parser(std::ifstream(DATADIR "bad/right-braket.cif"));
-    CHECK_THROWS_AS(parser.parse(), pacif::error);
 }
 
 TEST_CASE("Actual CIF files") {

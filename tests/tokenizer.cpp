@@ -150,6 +150,22 @@ TEST_CASE("tokenizer") {
         CHECK(token.kind() == token::Tag);
         CHECK(token.as_string() == "_string");
         CHECK(token.as_tag() == "_string");
+
+        CHECK_THROWS_AS(tokenizer("$string").next(), pacif::error);
+        CHECK_THROWS_AS(tokenizer("[string").next(), pacif::error);
+        CHECK_THROWS_AS(tokenizer("]string").next(), pacif::error);
+
+        token = tokenizer("'$string'").next();
+        CHECK(token.kind() == token::String);
+        CHECK(token.as_string() == "$string");
+
+        token = tokenizer("'[string'").next();
+        CHECK(token.kind() == token::String);
+        CHECK(token.as_string() == "[string");
+
+        token = tokenizer("']string'").next();
+        CHECK(token.kind() == token::String);
+        CHECK(token.as_string() == "]string");
     }
 
     SECTION("numbers") {
