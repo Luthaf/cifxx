@@ -27,37 +27,40 @@ linux32_addons:
 matrix:
   fast_finish: true
   include:
-    - os: linux
+    - name: linux/clang
+      os: linux
       compiler: clang
       addons: *linux64
-    - os: linux
+    - name: linux/gcc
+      os: linux
       compiler: gcc
       addons: *linux64
-    - os: linux
+    - name: linux/gcc/32-bits
+      os: linux
       compiler: gcc
       env: CMAKE_EXTRA="-DHAVE_LIBM=/lib32/libm.so.6 -DCMAKE_CXX_FLAGS=-m32"
       addons: *linux32
-    - os: osx
+    - name: osx/clang
+      os: osx
       compiler: clang
-    - os: osx
+    - name: osx/gcc
+      os: osx
       compiler: gcc
 
 install:
   # Setting environement
   - cd $TRAVIS_BUILD_DIR
   - |
-    if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+    if [[ "$TRAVIS_OS_NAME" == "linux" && "${CXX}" == "g++" ]]; then
         export CXX=g++-4.8
     fi
   - |
-    if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    if [[ "$TRAVIS_OS_NAME" == "osx" && "${CXX}" == "g++" ]]; then
         brew update
-        if test "${CC}" == "gcc"; then
-            brew rm gcc
-            brew cask rm oclint
-            brew install gcc@5
-            export CXX=g++-5
-        fi
+        brew rm gcc
+        brew install gcc@5
+        brew link --overwrite gcc@5
+        export CXX=g++-5
     fi
 
 script:
