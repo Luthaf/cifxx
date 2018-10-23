@@ -22,8 +22,20 @@ TEST_CASE("Parse files") {
         CHECK(blocks[0].name() == "minimal");
     }
 
-    SECTION("tags") {
-        std::ifstream file(DATADIR "tags.cif");
+    SECTION("multiple data blocks") {
+        std::ifstream file(DATADIR "multiple_data.cif");
+        auto blocks = parser(file).parse();
+        REQUIRE(blocks.size() == 2);
+
+        CHECK(blocks[0].name() == "first");
+        CHECK(get(blocks[0], "_tag1").as_number() == 1);
+
+        CHECK(blocks[1].name() == "second");
+        CHECK(get(blocks[1], "_tag2").as_number() == 3);
+    }
+
+    SECTION("Basic usage") {
+        std::ifstream file(DATADIR "basic.cif");
         auto blocks = parser(file).parse();
         REQUIRE(blocks.size() == 1);
 
@@ -52,18 +64,6 @@ TEST_CASE("Parse files") {
         CHECK(get(blocks[0], "_single_quote2").as_string() == "a dog's life");
         CHECK(get(blocks[0], "_unicode_quoted").as_string() == "ℵ ⏣ ॵ 🤔 em: non-break: 45");
         CHECK(get(blocks[0], "_substitutions").as_string() == "\\a \\'e \\%a Csp^3^ \\\\ddb");
-    }
-
-    SECTION("multiple") {
-        std::ifstream file(DATADIR "multiple_data.cif");
-        auto blocks = parser(file).parse();
-        REQUIRE(blocks.size() == 2);
-
-        CHECK(blocks[0].name() == "first");
-        CHECK(get(blocks[0], "_tag1").as_number() == 1);
-
-        CHECK(blocks[1].name() == "second");
-        CHECK(get(blocks[1], "_tag2").as_number() == 3);
     }
 }
 
