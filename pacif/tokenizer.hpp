@@ -283,13 +283,22 @@ private:
             throw error("real value " + content + " is too big for 64-bit float type");
         }
 
+        if (content.empty()) {
+            throw error("invalid empty unquoted string value");
+        } else if (content[0] == '$' || content[0] == '[' || content[0] == ']') {
+            throw error(
+                "invalid string value '" + content + "': '" + content[0] +
+                "' is not allowed as the first character of unquoted strings"
+            );
+        }
+
         // default to a string value
         return token::string(content);
     }
 
-    const std::string input_;
+    std::string input_;
     string_t::const_iterator current_;
-    const string_t::const_iterator end_;
+    string_t::const_iterator end_;
 };
 
 }

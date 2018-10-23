@@ -60,6 +60,43 @@ TEST_CASE("Parse files") {
     }
 }
 
+TEST_CASE("Invalid CIF files") {
+    std::ifstream file(DATADIR "bad/no-data.cif");
+    REQUIRE(file);
+    auto parser = pacif::parser(file);
+    CHECK_THROWS_AS(parser.parse(), pacif::error);
+
+    file = std::ifstream(DATADIR "bad/empty.cif");
+    REQUIRE(file);
+    parser = pacif::parser(file);
+    CHECK_THROWS_AS(parser.parse(), pacif::error);
+
+    file = std::ifstream(DATADIR "bad/global.cif");
+    REQUIRE(file);
+    parser = pacif::parser(file);
+    CHECK_THROWS_AS(parser.parse(), pacif::error);
+
+    file = std::ifstream(DATADIR "bad/save.cif");
+    REQUIRE(file);
+    parser = pacif::parser(file);
+    CHECK_THROWS_AS(parser.parse(), pacif::error);
+
+    file = std::ifstream(DATADIR "bad/save-ref.cif");
+    REQUIRE(file);
+    parser = pacif::parser(file);
+    CHECK_THROWS_AS(parser.parse(), pacif::error);
+
+    file = std::ifstream(DATADIR "bad/left-bracket.cif");
+    REQUIRE(file);
+    parser = pacif::parser(file);
+    CHECK_THROWS_AS(parser.parse(), pacif::error);
+
+    file = std::ifstream(DATADIR "bad/right-bracket.cif");
+    REQUIRE(file);
+    parser = pacif::parser(file);
+    CHECK_THROWS_AS(parser.parse(), pacif::error);
+}
+
 TEST_CASE("Actual CIF files") {
     SECTION("Crystalographic CIF file") {
         std::ifstream file(DATADIR "it023_br.cif");

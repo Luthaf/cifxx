@@ -27,6 +27,7 @@
 #define PACIF_PARSER_HPP
 
 #include <streambuf>
+#include <istream>
 
 #include "data.hpp"
 #include "tokenizer.hpp"
@@ -37,9 +38,11 @@ class parser final {
 public:
     explicit parser(std::string input): tokenizer_(std::move(input)), current_(tokenizer_.next()) {}
 
-    template<typename stream>
-    explicit parser(stream& input):
+    explicit parser(std::istream& input):
         parser({std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()}) {}
+
+    parser(parser&&) = default;
+    parser& operator=(parser&&) = default;
 
     std::vector<data> parse() {
         std::vector<data> data_blocks;

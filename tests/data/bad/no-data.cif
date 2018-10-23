@@ -1,0 +1,7 @@
+# tags before a data_ header
+
+_tag1 value
+
+data_glob
+
+_tag2 2.5

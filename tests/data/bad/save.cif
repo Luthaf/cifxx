@@ -1,0 +1,12 @@
+# Save block is allowed in STAR but forbidden in CIF
+
+data_sav
+
+_tag1 2.0
+
+save_test
+
+_tag2 Hey
+_tag3 45.2(45)
+
+save_

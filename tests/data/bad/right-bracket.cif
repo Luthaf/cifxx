@@ -1,0 +1,5 @@
+# ']' can not start an unquoted string
+
+data_lb
+
+_tag1 ]bad

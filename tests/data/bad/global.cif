@@ -1,0 +1,9 @@
+# Global block is allowed in STAR but forbidden in CIF
+
+global_
+_tag1 value
+_tag2 2.5
+
+data_glob
+
+_tag3 2.0
