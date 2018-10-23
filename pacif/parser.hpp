@@ -44,12 +44,6 @@ public:
         std::istreambuf_iterator<char>()
     }) {}
 
-    template<typename Stream>
-    explicit parser(Stream& input): parser({
-        std::istreambuf_iterator<char>(input),
-        std::istreambuf_iterator<char>()
-    }) {}
-
     parser(parser&&) = default;
     parser& operator=(parser&&) = default;
 
