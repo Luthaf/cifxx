@@ -32,7 +32,9 @@ TEST_CASE("Parse files") {
         CHECK(get(blocks[0], "_real").as_number() == 3.252);
         CHECK(get(blocks[0], "_integer").as_number() == 42);
         CHECK(get(blocks[0], "_long_string").as_string() == " test here\n for a long string\n");
-        CHECK(get(blocks[0], "_other_line").as_number() == 25);
+        CHECK(get(blocks[0], "_next_line").as_number() == 25);
+        CHECK(get(blocks[0], "_next_line_comment").as_string() == "str");
+        CHECK(get(blocks[0], "_hash_in_str").as_string() == "s#t#r#");
 
         auto looped = get(blocks[0], "_looped").as_vector();
         CHECK(looped.size() == 3);
@@ -45,6 +47,11 @@ TEST_CASE("Parse files") {
         CHECK(changing_type[0].as_string() == "fe");
         CHECK(changing_type[1].as_number() == 4);
         CHECK(changing_type[2].as_string() == "zn");
+
+        CHECK(get(blocks[0], "_single_quote").as_string() == "data");
+        CHECK(get(blocks[0], "_single_quote2").as_string() == "a dog's life");
+        CHECK(get(blocks[0], "_unicode_quoted").as_string() == "ℵ ⏣ ॵ 🤔 em: non-break: 45");
+        CHECK(get(blocks[0], "_substitutions").as_string() == "\\a \\'e \\%a Csp^3^ \\\\ddb");
     }
 
     SECTION("multiple") {

@@ -9,9 +9,14 @@ _long_string
 ; for a long string
 ;
 
-_other_line
+_next_line
 
 25
+
+_next_line_comment # comment
+str
+
+_hash_in_str s#t#r#
 
 loop_
 _looped
@@ -19,3 +24,12 @@ _changing_type
 1 fe
 2 4
 3 zn
+
+_single_quote 'data'
+_single_quote2 'a dog's life'
+
+# This is officially unsuported by CIF 1.1, but should be fine with pacif
+_unicode_quoted 'ℵ ⏣ ॵ 🤔 em: non-break: 45'
+
+# Substitutions are passed through to the application
+_substitutions "\a \'e \%a Csp^3^ \\ddb"
