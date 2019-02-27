@@ -134,3 +134,78 @@ TEST_CASE("Actual CIF files") {
         CHECK(x[150].as_number() == 22.302);
     }
 }
+
+TEST_CASE("Problematic CIF files") {
+    SECTION("Additional loop_") {
+        std::ifstream file(DATADIR "weird-loops.cif");
+        auto blocks = parser(file).parse();
+        REQUIRE(blocks.size() == 1);
+
+        auto block = blocks[0];
+        CHECK(block.name() == "quartz");
+
+        // There is an additional loop_ before _cell_length_a
+        CHECK(get(block, "_cell_length_a").as_vector()[0].as_number() == 4.916);
+        CHECK(get(block, "_cell_length_b").as_number() == 4.916);
+
+        CHECK(get(block, "_space_group_symop_operation_xyz").as_vector().size() == 6);
+    }
+
+    SECTION("Repeated tag in loop") {
+        std::ifstream file(DATADIR "repeat-loop-tag.cif");
+        auto blocks = parser(file).parse();
+        REQUIRE(blocks.size() == 1);
+
+        auto block = blocks[0];
+        CHECK(block.name() == "VESTA_phase_1");
+
+        auto labels = get(block, "_atom_site_label").as_vector();
+        CHECK(labels.size() == 224);
+        CHECK(labels[0].as_string() == "H");
+        CHECK(labels[110].as_string() == "C");
+        CHECK(labels[205].as_string() == "O");
+        CHECK(labels[221].as_string() == "Zn");
+    }
+
+    SECTION("Missing data") {
+        std::ifstream file(DATADIR "missing-data.cif");
+        auto blocks = parser(file).parse();
+        REQUIRE(blocks.size() == 5);
+
+        auto block = blocks[1];
+        CHECK(block.name() == "sm_isp_SD0308014-standardized_unitcell");
+
+        CHECK(get(block, "_symmetry_Int_Tables_number").as_number() == 151);
+        CHECK(get(block, "_sm_cell_transformation").as_string() == "No transformation from published to standardized cell parameters necessary.\n");
+
+        auto frac_x = get(block, "_atom_site_fract_x").as_vector();
+        CHECK(frac_x.size() == 5);
+        CHECK(frac_x[0].as_number() == 0.11111);
+        CHECK(frac_x[2].as_number() == 0.44445);
+
+        auto numbers = get(block, "_sm_coordination_number").as_vector();
+        CHECK(numbers.size() == 5);
+        CHECK(numbers[0].is_missing());
+        CHECK(numbers[2].is_missing());
+
+        auto environment = get(block, "_sm_atomic_environment_type").as_vector();
+        CHECK(environment.size() == 5);
+        CHECK(environment[0].as_string() == "?");
+        CHECK(environment[2].as_string() == "?");
+
+        block = blocks[2];
+        CHECK(block.name() == "sm_isp_SD0308014-published_cell");
+
+        frac_x = get(block, "_atom_site_fract_x").as_vector();
+        CHECK(frac_x.size() == 1);
+        CHECK(frac_x[0].is_missing());
+
+        numbers = get(block, "_sm_coordination_number").as_vector();
+        CHECK(numbers.size() == 1);
+        CHECK(numbers[0].is_missing());
+
+        environment = get(block, "_sm_atomic_environment_type").as_vector();
+        CHECK(environment.size() == 1);
+        CHECK(environment[0].is_missing());
+    }
+}
