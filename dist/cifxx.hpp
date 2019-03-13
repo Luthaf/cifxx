@@ -665,10 +665,22 @@ public:
 
     /// Lookup the given `key` in this block.
     ///
-    /// @returns an iterator pointing to the value associated with `key` if the
-    ///          key is present, or `data::end()` if the key is not present.
+    /// @returns an iterator pointing to the key/value pair if the key is
+    ///          present in the data, or `data::end()` if the key is not present.
     const_iterator find(const std::string& key) const {
         return data_.find(key);
+    }
+
+    /// Find and return the given `key` in this block.
+    ///
+    /// @throws cifxx::error if their is no value associated with `key`.
+    /// @returns the value associated with `key`.
+    const value& get(const std::string& key) const {
+        auto it = data_.find(key);
+        if (it == data_.end()) {
+            throw cifxx::error("could not find " + key + " in this CIF data block");
+        }
+        return it->second;
     }
 
     /// Insert a value in the data block, associated with the given `tag`.

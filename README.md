@@ -64,6 +64,9 @@ if (it != block.end()) {
     auto value = *it;
 }
 
+// or directly get it if you are sure it exists
+auto value = block.get("_tag");
+
 // Iterate over all tags in the data block
 for (auto& it: block) {
     if (it.first == "_tag") {
