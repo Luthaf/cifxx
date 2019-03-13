@@ -23,13 +23,13 @@
 // IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 // OF SUCH DAMAGE.
 
-#ifndef PACIF_TOKEN_HPP
-#define PACIF_TOKEN_HPP
+#ifndef CIFXX_TOKEN_HPP
+#define CIFXX_TOKEN_HPP
 
 #include <cassert>
 #include "types.hpp"
 
-namespace pacif {
+namespace cifxx {
 
 /// Check if a given char is a non whitespace printable char
 inline bool is_non_blank_char(char c) {

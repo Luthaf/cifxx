@@ -23,30 +23,15 @@
 // IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 // OF SUCH DAMAGE.
 
-#ifndef PACIF_TYPES_HPP
-#define PACIF_TYPES_HPP
+#ifndef CIFXX_HPP
+#define CIFXX_HPP
 
-#include <string>
-#include <vector>
-#include <stdexcept>
+#include "cifxx/types.hpp"
 
-namespace pacif {
+#include "cifxx/token.hpp"
+#include "cifxx/parser.hpp"
 
-class value;
-
-/// String type used for string values
-using string_t = std::string;
-/// Floating point type used for numeric values
-using number_t = double;
-/// Vector type used for vector values
-using vector_t = std::vector<value>;
-
-/// Exception class for all errors
-class error: public std::runtime_error {
-public:
-    explicit error(std::string message): std::runtime_error(std::move(message)) {}
-};
-
-}
+#include "cifxx/value.hpp"
+#include "cifxx/data.hpp"
 
 #endif

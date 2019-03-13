@@ -23,14 +23,14 @@
 // IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 // OF SUCH DAMAGE.
 
-#ifndef PACIF_DATA_HPP
-#define PACIF_DATA_HPP
+#ifndef CIFXX_DATA_HPP
+#define CIFXX_DATA_HPP
 
 #include <map>
 #include "value.hpp"
 #include "token.hpp"
 
-namespace pacif {
+namespace cifxx {
 
 /// A data block in a CIF file
 class data final {

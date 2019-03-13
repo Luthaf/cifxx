@@ -1,6 +1,6 @@
 #include "catch/catch.hpp"
-#include "pacif/value.hpp"
-using namespace pacif;
+#include "cifxx/value.hpp"
+using namespace cifxx;
 
 TEST_CASE("value class") {
     SECTION("Missing") {
@@ -9,9 +9,9 @@ TEST_CASE("value class") {
 
         CHECK(missing.kind() == value::Missing);
 
-        CHECK_THROWS_AS(missing.as_number(), pacif::error);
-        CHECK_THROWS_AS(missing.as_string(), pacif::error);
-        CHECK_THROWS_AS(missing.as_vector(), pacif::error);
+        CHECK_THROWS_AS(missing.as_number(), cifxx::error);
+        CHECK_THROWS_AS(missing.as_string(), cifxx::error);
+        CHECK_THROWS_AS(missing.as_vector(), cifxx::error);
     }
 
     SECTION("Numbers") {
@@ -21,12 +21,12 @@ TEST_CASE("value class") {
 
         number = value(42);
         REQUIRE(number.is_number());
-        CHECK(number.as_number() == static_cast<pacif::number_t>(42));
+        CHECK(number.as_number() == static_cast<cifxx::number_t>(42));
 
         CHECK(number.kind() == value::Number);
 
-        CHECK_THROWS_AS(number.as_string(), pacif::error);
-        CHECK_THROWS_AS(number.as_vector(), pacif::error);
+        CHECK_THROWS_AS(number.as_string(), cifxx::error);
+        CHECK_THROWS_AS(number.as_vector(), cifxx::error);
     }
 
     SECTION("Strings") {
@@ -36,8 +36,8 @@ TEST_CASE("value class") {
 
         CHECK(string.kind() == value::String);
 
-        CHECK_THROWS_AS(string.as_number(), pacif::error);
-        CHECK_THROWS_AS(string.as_vector(), pacif::error);
+        CHECK_THROWS_AS(string.as_number(), cifxx::error);
+        CHECK_THROWS_AS(string.as_vector(), cifxx::error);
     }
 
 
@@ -49,7 +49,7 @@ TEST_CASE("value class") {
 
         CHECK(vector.kind() == value::Vector);
 
-        CHECK_THROWS_AS(vector.as_string(), pacif::error);
-        CHECK_THROWS_AS(vector.as_number(), pacif::error);
+        CHECK_THROWS_AS(vector.as_string(), cifxx::error);
+        CHECK_THROWS_AS(vector.as_number(), cifxx::error);
     }
 }

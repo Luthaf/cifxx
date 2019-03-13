@@ -23,13 +23,13 @@
 // IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 // OF SUCH DAMAGE.
 
-#ifndef PACIF_TOKENIZER_HPP
-#define PACIF_TOKENIZER_HPP
+#ifndef CIFXX_TOKENIZER_HPP
+#define CIFXX_TOKENIZER_HPP
 
 #include <algorithm>
 #include "token.hpp"
 
-namespace pacif {
+namespace cifxx {
 
 /// Check if a given char is an ordinary char
 inline bool is_ordinary_char(char c) {

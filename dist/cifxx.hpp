@@ -1,3 +1,4 @@
+#line 1 "cifxx.hpp"
 // Copyright (c) 2017-2018, Guillaume Fraux
 // All rights reserved.
 // Redistribution and use in source and binary forms, with or without
@@ -23,9 +24,9 @@
 // IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 // OF SUCH DAMAGE.
 
-#ifndef PACIF_HPP
-#define PACIF_HPP
-#line 1 "pacif/types.hpp"
+#ifndef CIFXX_HPP
+#define CIFXX_HPP
+#line 1 "cifxx/types.hpp"
 // Copyright (c) 2017-2018, Guillaume Fraux
 // All rights reserved.
 // Redistribution and use in source and binary forms, with or without
@@ -51,14 +52,14 @@
 // IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 // OF SUCH DAMAGE.
 
-#ifndef PACIF_TYPES_HPP
-#define PACIF_TYPES_HPP
+#ifndef CIFXX_TYPES_HPP
+#define CIFXX_TYPES_HPP
 
 #include <string>
 #include <vector>
 #include <stdexcept>
 
-namespace pacif {
+namespace cifxx {
 
 class value;
 
@@ -78,7 +79,7 @@ public:
 }
 
 #endif
-#line 1 "pacif/token.hpp"
+#line 1 "cifxx/token.hpp"
 // Copyright (c) 2017-2018, Guillaume Fraux
 // All rights reserved.
 // Redistribution and use in source and binary forms, with or without
@@ -104,13 +105,13 @@ public:
 // IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 // OF SUCH DAMAGE.
 
-#ifndef PACIF_TOKEN_HPP
-#define PACIF_TOKEN_HPP
+#ifndef CIFXX_TOKEN_HPP
+#define CIFXX_TOKEN_HPP
 
 #include <cassert>
 
 
-namespace pacif {
+namespace cifxx {
 
 /// Check if a given char is a non whitespace printable char
 inline bool is_non_blank_char(char c) {
@@ -136,17 +137,17 @@ inline bool is_tag_name(const std::string& name) {
 class token final {
 public:
     enum Kind {
-        Eof, // end of file (end of input)
-        Loop, // `loop_` literal
-        Stop, // `stop_` literal
-        Global, // `global_` literal
-        Tag, // a tag
-        Number, // a numeric value
-        String, // a string value
-        Data, // data frame header
-        Save, // save frame header
-        QuestionMark, // `?` literal
-        Dot, // `.` literal
+        Eof,            // end of file (end of input)
+        Loop,           // `loop_` literal
+        Stop,           // `stop_` literal
+        Global,         // `global_` literal
+        Tag,            // a tag
+        Number,         // a numeric value
+        String,         // a string value
+        Data,           // data frame header
+        Save,           // save frame header
+        QuestionMark,   // `?` literal
+        Dot,            // `.` literal
     };
 
     /// Create a new token representing the end of file
@@ -372,7 +373,7 @@ private:
 }
 
 #endif
-#line 1 "pacif/parser.hpp"
+#line 1 "cifxx/parser.hpp"
 // Copyright (c) 2017-2018, Guillaume Fraux
 // All rights reserved.
 // Redistribution and use in source and binary forms, with or without
@@ -398,10 +399,11 @@ private:
 // IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 // OF SUCH DAMAGE.
 
-#ifndef PACIF_PARSER_HPP
-#define PACIF_PARSER_HPP
+#ifndef CIFXX_PARSER_HPP
+#define CIFXX_PARSER_HPP
 
 #include <streambuf>
+#include <istream>
 #line 1 "data.hpp"
 // Copyright (c) 2017-2018, Guillaume Fraux
 // All rights reserved.
@@ -428,8 +430,8 @@ private:
 // IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 // OF SUCH DAMAGE.
 
-#ifndef PACIF_DATA_HPP
-#define PACIF_DATA_HPP
+#ifndef CIFXX_DATA_HPP
+#define CIFXX_DATA_HPP
 
 #include <map>
 #line 1 "value.hpp"
@@ -458,17 +460,17 @@ private:
 // IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 // OF SUCH DAMAGE.
 
-#ifndef PACIF_VALUE_HPP
-#define PACIF_VALUE_HPP
+#ifndef CIFXX_VALUE_HPP
+#define CIFXX_VALUE_HPP
 
 
 
-namespace pacif {
+namespace cifxx {
 
 /// Possible values in CIF data block.
 ///
-/// A `pacif::value` can be a floating point number, a string or a vector of
-/// `pacif::value`. It is represented as a tagged union.
+/// A `cifxx::value` can be a floating point number, a string or a vector of
+/// `cifxx::value`. It is represented as a tagged union.
 class value final {
 public:
     /// Available kinds of value
@@ -480,7 +482,7 @@ public:
         Number,
         /// A string value
         String,
-        /// A vector of `pacif::value`
+        /// A vector of `cifxx::value`
         Vector,
     };
 
@@ -641,7 +643,7 @@ private:
 
 #endif
 #line 33 "data.hpp"
-namespace pacif {
+namespace cifxx {
 
 /// A data block in a CIF file
 class data final {
@@ -727,13 +729,13 @@ private:
 // IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 // OF SUCH DAMAGE.
 
-#ifndef PACIF_TOKENIZER_HPP
-#define PACIF_TOKENIZER_HPP
+#ifndef CIFXX_TOKENIZER_HPP
+#define CIFXX_TOKENIZER_HPP
 
 #include <algorithm>
 
 
-namespace pacif {
+namespace cifxx {
 
 /// Check if a given char is an ordinary char
 inline bool is_ordinary_char(char c) {
@@ -987,28 +989,42 @@ private:
             throw error("real value " + content + " is too big for 64-bit float type");
         }
 
+        if (content.empty()) {
+            throw error("invalid empty unquoted string value");
+        } else if (content[0] == '$' || content[0] == '[' || content[0] == ']') {
+            throw error(
+                "invalid string value '" + content + "': '" + content[0] +
+                "' is not allowed as the first character of unquoted strings"
+            );
+        }
+
         // default to a string value
         return token::string(content);
     }
 
-    const std::string input_;
+    std::string input_;
     string_t::const_iterator current_;
-    const string_t::const_iterator end_;
+    string_t::const_iterator end_;
 };
 
 }
 
 #endif
-#line 34 "pacif/parser.hpp"
-namespace pacif {
+#line 35 "cifxx/parser.hpp"
+namespace cifxx {
 
 class parser final {
 public:
     explicit parser(std::string input): tokenizer_(std::move(input)), current_(tokenizer_.next()) {}
 
-    template<typename stream>
-    explicit parser(stream& input):
-        parser({std::istreambuf_iterator<char>(input), std::istreambuf_iterator<char>()}) {}
+    template<typename Stream>
+    explicit parser(Stream&& input): parser({
+        std::istreambuf_iterator<char>(input),
+        std::istreambuf_iterator<char>()
+    }) {}
+
+    parser(parser&&) = default;
+    parser& operator=(parser&&) = default;
 
     std::vector<data> parse() {
         std::vector<data> data_blocks;
@@ -1125,5 +1141,5 @@ private:
 }
 
 #endif
-#line 37 "pacif.hpp"
+#line 37 "cifxx.hpp"
 #endif

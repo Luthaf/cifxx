@@ -1,8 +1,8 @@
-# Pacif, a C++11 header only CIF files parser
+# Cifxx, a C++11 header only CIF files parser
 
-[![Build Status](https://travis-ci.org/chemfiles/pacif.svg?branch=master)](https://travis-ci.org/chemfiles/pacif)
+[![Build Status](https://travis-ci.org/chemfiles/cifxx.svg?branch=master)](https://travis-ci.org/chemfiles/cifxx)
 
-Pacif is a CIF files parser written in modern C++ (C++11), in an single header,
+Cifxx is a CIF files parser written in modern C++ (C++11), in an single header,
 distributed under the 3 clauses BSD license.
 
 It parses files that follow the CIF/STAR grammar, as described in
@@ -12,7 +12,7 @@ protein. It originates from and is also used by the crystallographic community,
 where is is used to store atomic coordinates with symmetry in a given space
 group.
 
-Pacif does not perform any validation of any sort, or coordinate generation from
+Cifxx does not perform any validation of any sort, or coordinate generation from
 the symmetry group: this is left to the application.
 
 # Features
@@ -24,7 +24,7 @@ the symmetry group: this is left to the application.
 
 # Installation
 
-Grap the [header](dist/pacif.hpp), and drop it in your project. You're good to
+Grap the [header](dist/cifxx.hpp), and drop it in your project. You're good to
 go!
 
 # Usage
@@ -33,19 +33,19 @@ The main class is the `parser` class, used to read files:
 
 ```cpp
 auto file = std::ifstream("file.cif");
-auto parser = pacif::parser(file);
+auto parser = cifxx::parser(file);
 ```
 
 Any kind of iterator on `char` can be passed to the constructor, a `std::string`
 formatted as CIF data also works.
 
-Parsing the file can throw `pacif::error`, and return a `std::vector` of `data`
+Parsing the file can throw `cifxx::error`, and return a `std::vector` of `data`
 blocks:
 
 ```cpp
 try {
     auto blocks = parser.parse();
-} catch (const pacif::error& e) {
+} catch (const cifxx::error& e) {
     // invalid file
 }
 ```
@@ -94,7 +94,7 @@ if value.is_number() {
 if value.is_vector() {
     auto vector = value.as_vector();
     for (auto& value: vector) {
-        // each vector element is a pacif::value,
+        // each vector element is a cifxx::value,
         // which can again have various type.
     }
 }
@@ -102,6 +102,6 @@ if value.is_vector() {
 
 # License
 
-Guillaume Fraux created and maintains Pacif, which is distributed under the
-[3 clauses BSD license](LICENSE). By contributing to Pacif, you agree to
+Guillaume Fraux created and maintains Cifxx, which is distributed under the
+[3 clauses BSD license](LICENSE). By contributing to Cifxx, you agree to
 distribute your contributions under the same license.

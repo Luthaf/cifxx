@@ -23,17 +23,17 @@
 // IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 // OF SUCH DAMAGE.
 
-#ifndef PACIF_VALUE_HPP
-#define PACIF_VALUE_HPP
+#ifndef CIFXX_VALUE_HPP
+#define CIFXX_VALUE_HPP
 
 #include "types.hpp"
 
-namespace pacif {
+namespace cifxx {
 
 /// Possible values in CIF data block.
 ///
-/// A `pacif::value` can be a floating point number, a string or a vector of
-/// `pacif::value`. It is represented as a tagged union.
+/// A `cifxx::value` can be a floating point number, a string or a vector of
+/// `cifxx::value`. It is represented as a tagged union.
 class value final {
 public:
     /// Available kinds of value
@@ -45,7 +45,7 @@ public:
         Number,
         /// A string value
         String,
-        /// A vector of `pacif::value`
+        /// A vector of `cifxx::value`
         Vector,
     };
 

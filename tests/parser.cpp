@@ -1,15 +1,15 @@
 #include <fstream>
 
 #include "catch/catch.hpp"
-#include "pacif/parser.hpp"
-using namespace pacif;
+#include "cifxx/parser.hpp"
+using namespace cifxx;
 
 static value get(const data& block, const std::string& key) {
     auto it = block.find(key);
     if (it != block.end()) {
         return it->second;
     } else {
-        throw pacif::error("missing data for key " + key);
+        throw cifxx::error("missing data for key " + key);
     }
 }
 
@@ -68,17 +68,17 @@ TEST_CASE("Parse files") {
 }
 
 TEST_CASE("Invalid CIF files") {
-    auto parser = pacif::parser(std::ifstream(DATADIR "bad/no-data.cif"));
-    CHECK_THROWS_AS(parser.parse(), pacif::error);
+    auto parser = cifxx::parser(std::ifstream(DATADIR "bad/no-data.cif"));
+    CHECK_THROWS_AS(parser.parse(), cifxx::error);
 
-    parser = pacif::parser(std::ifstream(DATADIR "bad/empty.cif"));
-    CHECK_THROWS_AS(parser.parse(), pacif::error);
+    parser = cifxx::parser(std::ifstream(DATADIR "bad/empty.cif"));
+    CHECK_THROWS_AS(parser.parse(), cifxx::error);
 
-    parser = pacif::parser(std::ifstream(DATADIR "bad/global.cif"));
-    CHECK_THROWS_AS(parser.parse(), pacif::error);
+    parser = cifxx::parser(std::ifstream(DATADIR "bad/global.cif"));
+    CHECK_THROWS_AS(parser.parse(), cifxx::error);
 
-    parser = pacif::parser(std::ifstream(DATADIR "bad/save.cif"));
-    CHECK_THROWS_AS(parser.parse(), pacif::error);
+    parser = cifxx::parser(std::ifstream(DATADIR "bad/save.cif"));
+    CHECK_THROWS_AS(parser.parse(), cifxx::error);
 }
 
 TEST_CASE("Actual CIF files") {

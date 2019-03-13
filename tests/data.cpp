@@ -1,9 +1,9 @@
 #include "catch/catch.hpp"
-#include "pacif/data.hpp"
-using namespace pacif;
+#include "cifxx/data.hpp"
+using namespace cifxx;
 
 TEST_CASE("data class") {
-    auto data = pacif::data("this_is_data");
+    auto data = cifxx::data("this_is_data");
 
     CHECK(data.find("_foo") == data.end());
 

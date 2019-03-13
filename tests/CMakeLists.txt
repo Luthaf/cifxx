@@ -1,6 +1,6 @@
 add_library(catch STATIC catch/catch.cpp)
 
-function(pacif_test _file_)
+function(cifxx_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
     add_executable(${_name_} ${_file_})
     target_include_directories(${_name_} PRIVATE ${PROJECT_SOURCE_DIR})
@@ -16,7 +16,7 @@ file(GLOB all_test_files
 )
 
 foreach(test_file IN LISTS all_test_files)
-    pacif_test(${test_file})
+    cifxx_test(${test_file})
 endforeach(test_file)
 
 target_compile_definitions(parser PRIVATE "-DDATADIR=\"${CMAKE_CURRENT_SOURCE_DIR}/data/\"")

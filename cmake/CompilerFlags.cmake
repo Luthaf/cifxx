@@ -28,7 +28,7 @@ macro(add_warning_flag _flag_)
     endif()
 endmacro()
 
-set(PACIF_CXX_WARNINGS "")
+set(CIFXX_CXX_WARNINGS "")
 
 macro(remove_msvc_warning _warn_)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd${_warn_}")

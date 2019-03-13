@@ -23,8 +23,8 @@
 // IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY
 // OF SUCH DAMAGE.
 
-#ifndef PACIF_PARSER_HPP
-#define PACIF_PARSER_HPP
+#ifndef CIFXX_PARSER_HPP
+#define CIFXX_PARSER_HPP
 
 #include <streambuf>
 #include <istream>
@@ -32,7 +32,7 @@
 #include "data.hpp"
 #include "tokenizer.hpp"
 
-namespace pacif {
+namespace cifxx {
 
 class parser final {
 public:

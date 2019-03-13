@@ -1,6 +1,6 @@
 #include "catch/catch.hpp"
-#include "pacif/tokenizer.hpp"
-using namespace pacif;
+#include "cifxx/tokenizer.hpp"
+using namespace cifxx;
 
 TEST_CASE("basic values parsing") {
     SECTION("digit") {
@@ -9,7 +9,7 @@ TEST_CASE("basic values parsing") {
         };
 
         for (auto c: DIGITS) {
-            CHECK(pacif::is_digit(c));
+            CHECK(cifxx::is_digit(c));
         }
     }
 
@@ -25,9 +25,9 @@ TEST_CASE("basic values parsing") {
         };
 
         for (auto c: ORDINARY_CHARS) {
-            CHECK(pacif::is_ordinary_char(c));
-            CHECK(pacif::is_non_blank_char(c));
-            CHECK_FALSE(pacif::is_whitespace(c));
+            CHECK(cifxx::is_ordinary_char(c));
+            CHECK(cifxx::is_non_blank_char(c));
+            CHECK_FALSE(cifxx::is_whitespace(c));
         }
     }
 
@@ -44,8 +44,8 @@ TEST_CASE("basic values parsing") {
         };
 
         for (auto c: NON_BLANK_CHARS) {
-            CHECK(pacif::is_non_blank_char(c));
-            CHECK_FALSE(pacif::is_whitespace(c));
+            CHECK(cifxx::is_non_blank_char(c));
+            CHECK_FALSE(cifxx::is_whitespace(c));
         }
     }
 
@@ -58,7 +58,7 @@ TEST_CASE("basic values parsing") {
         };
 
         for (auto& tag: TAGS) {
-            CHECK(pacif::is_tag_name(tag));
+            CHECK(cifxx::is_tag_name(tag));
         }
 
         std::vector<std::string> NOT_TAGS = {
@@ -69,7 +69,7 @@ TEST_CASE("basic values parsing") {
         };
 
         for (auto& tag: NOT_TAGS) {
-            CHECK_FALSE(pacif::is_tag_name(tag));
+            CHECK_FALSE(cifxx::is_tag_name(tag));
         }
     }
 }
@@ -151,9 +151,9 @@ TEST_CASE("tokenizer") {
         CHECK(token.as_string() == "_string");
         CHECK(token.as_tag() == "_string");
 
-        CHECK_THROWS_AS(tokenizer("$string").next(), pacif::error);
-        CHECK_THROWS_AS(tokenizer("[string").next(), pacif::error);
-        CHECK_THROWS_AS(tokenizer("]string").next(), pacif::error);
+        CHECK_THROWS_AS(tokenizer("$string").next(), cifxx::error);
+        CHECK_THROWS_AS(tokenizer("[string").next(), cifxx::error);
+        CHECK_THROWS_AS(tokenizer("]string").next(), cifxx::error);
 
         token = tokenizer("'$string'").next();
         CHECK(token.kind() == token::String);

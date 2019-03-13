@@ -5,9 +5,9 @@ command -v pcpp >/dev/null 2>&1 || {
     exit 1
 }
 
-pcpp -o dist/pacif.hpp \
+pcpp -o dist/cifxx.hpp \
     --passthru-defines \
     --passthru-unfound-includes \
     --passthru-unknown-exprs \
     --passthru-comments \
-    pacif.hpp
+    cifxx.hpp
