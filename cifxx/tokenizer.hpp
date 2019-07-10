@@ -135,6 +135,11 @@ public:
         }
     }
 
+    /// Get the current line number in the input, starting at 1
+    size_t line() const {
+        return line_;
+    }
+
 private:
 
     /// Check if we reached the end of the input
@@ -142,11 +147,26 @@ private:
         return current_ == end_;
     }
 
-    /// Advance the current char by one and return the current char. If the input
-    /// stream is finished, return '\0'
+    /// Advance the current char by one and return the current char. If the
+    /// input stream is finished, return '\0'
     char advance() {
         if (!finished()) {
-            return *current_++;
+            auto c = *current_++;
+
+            // increment line counter
+            if (current_[-1] == '\n') {
+                line_++;
+            } else if (current_[-1] == '\r') {
+                if (*current_ == '\n') {
+                    // windows style line, don't increment line count, it will
+                    // be done on the next call to advance
+                } else {
+                    // classic MacOS style
+                    line_++;
+                }
+            }
+
+            return c;
         } else {
             return '\0';
         }
@@ -282,9 +302,9 @@ private:
         }
 
         if (content.empty()) {
-            throw error("invalid empty unquoted string value");
+            throw_error("invalid empty unquoted string value");
         } else if (content[0] == '$' || content[0] == '[' || content[0] == ']') {
-            throw error(
+            throw_error(
                 "invalid string value '" + content + "': '" + content[0] +
                 "' is not allowed as the first character of unquoted strings"
             );
@@ -294,7 +314,15 @@ private:
         return token::string(std::move(content));
     }
 
+    [[noreturn]] void throw_error(std::string message) const {
+        throw error(
+            "error on line " + std::to_string(line_) + ": " + message
+        );
+    }
+
     std::string input_;
+    size_t line_ = 1;
+
     string_t::const_iterator current_;
     string_t::const_iterator end_;
 };

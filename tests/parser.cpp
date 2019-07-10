@@ -69,16 +69,24 @@ TEST_CASE("Parse files") {
 
 TEST_CASE("Invalid CIF files") {
     auto parser = cifxx::parser(std::ifstream(DATADIR "bad/no-data.cif"));
-    CHECK_THROWS_AS(parser.parse(), cifxx::error);
+    CHECK_THROWS_WITH(parser.parse(),
+        "error on line 3: expected 'data_' at the begining of the data block, got '_tag1'"
+    );
 
     parser = cifxx::parser(std::ifstream(DATADIR "bad/empty.cif"));
-    CHECK_THROWS_AS(parser.parse(), cifxx::error);
+    CHECK_THROWS_WITH(parser.parse(),
+        "error on line 4: expected a value for tag _tag1 , got <eof>"
+    );
 
     parser = cifxx::parser(std::ifstream(DATADIR "bad/global.cif"));
-    CHECK_THROWS_AS(parser.parse(), cifxx::error);
+    CHECK_THROWS_WITH(parser.parse(),
+        "error on line 3: expected 'data_' at the begining of the data block, got 'global_'"
+    );
 
     parser = cifxx::parser(std::ifstream(DATADIR "bad/save.cif"));
-    CHECK_THROWS_AS(parser.parse(), cifxx::error);
+    CHECK_THROWS_WITH(parser.parse(),
+        "error on line 7: save frame are not implemented"
+    );
 }
 
 TEST_CASE("Actual CIF files") {
