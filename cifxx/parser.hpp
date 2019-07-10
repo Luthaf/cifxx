@@ -47,37 +47,22 @@ public:
     parser(parser&&) = default;
     parser& operator=(parser&&) = default;
 
+    /// Parse a whole file and get all the data blocks inside
     std::vector<data> parse() {
-        std::vector<data> data_blocks;
+        std::vector<data> data;
         while (!finished()) {
-            data_blocks.push_back(data_block());
+            data.push_back(next());
         }
-        return data_blocks;
+        return data;
     }
 
-private:
+    /// Check whether we have read all the data in the file
     bool finished() const {
         return current_.kind() == token::Eof;
     }
 
-    /// Advance the current token by one and return the current token.
-    token advance() {
-        if (!finished()) {
-            auto other = tokenizer_.next();
-            std::swap(other, current_);
-            return other;
-        } else {
-            return current_;
-        }
-    }
-
-    /// Check if the current token have a given kind
-    bool check(token::Kind kind) const {
-        return current_.kind() == kind;
-    }
-
-    /// Read a single data block
-    data data_block() {
+    /// Read a single data block from the file
+    data next() {
         if (!check(token::Data)) {
             throw error("expected 'data_' at the begining of the data block, got " + current_.print());
         }
@@ -98,6 +83,23 @@ private:
         }
 
         return block;
+    }
+
+private:
+    /// Advance the current token by one and return the current token.
+    token advance() {
+        if (!finished()) {
+            auto other = tokenizer_.next();
+            std::swap(other, current_);
+            return other;
+        } else {
+            return current_;
+        }
+    }
+
+    /// Check if the current token have a given kind
+    bool check(token::Kind kind) const {
+        return current_.kind() == kind;
     }
 
     /// Read a single tag + value

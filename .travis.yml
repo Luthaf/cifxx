@@ -54,14 +54,6 @@ install:
     if [[ "$TRAVIS_OS_NAME" == "linux" && "${CXX}" == "g++" ]]; then
         export CXX=g++-4.8
     fi
-  - |
-    if [[ "$TRAVIS_OS_NAME" == "osx" && "${CXX}" == "g++" ]]; then
-        brew update
-        brew rm gcc
-        brew install gcc@5
-        brew link --overwrite gcc@5
-        export CXX=g++-5
-    fi
 
 script:
   - cd $TRAVIS_BUILD_DIR
