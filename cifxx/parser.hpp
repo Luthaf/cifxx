@@ -64,7 +64,10 @@ public:
     /// Read a single data block from the file
     data next() {
         if (!check(token::Data)) {
-            throw error("expected 'data_' at the begining of the data block, got " + current_.print());
+            throw_error(
+                "expected 'data_' at the begining of the data block, "
+                "got '" + current_.print() + "'"
+            );
         }
         auto block = data(advance().as_string());
 
@@ -76,9 +79,12 @@ public:
             } else if (check(token::Loop)) {
                 read_loop(block);
             } else if (check(token::Save)) {
-                throw error("save frame are not implemented");
+                throw_error("save frame are not implemented");
             } else {
-                throw error("expected a tag, a loop or a save frame in data block, got " + current_.print());
+                throw_error(
+                    "expected a tag, a loop or a save frame in data block, "
+                    "got '" + current_.print() + "'"
+                );
             }
         }
 
@@ -114,7 +120,7 @@ private:
         } else if (check(token::String)) {
             block.insert(tag_name, advance().as_string());
         } else {
-            throw error("expected a value for tag " + tag_name + " , got " + current_.print());
+            throw_error("expected a value for tag " + tag_name + " , got " + current_.print());
         }
     }
 
@@ -145,7 +151,7 @@ private:
         }
 
         if (current % values.size() != 0) {
-            throw error(
+            throw_error(
                 "not enough values in the last loop iteration: expected " +
                 std::to_string(values.size()) + " got " +
                 std::to_string(current % values.size())
@@ -155,6 +161,12 @@ private:
         for (auto it: values) {
             block.insert(std::move(it.first), std::move(it.second));
         }
+    }
+
+    [[noreturn]] void throw_error(std::string message) {
+        throw error(
+            "error on line " + std::to_string(tokenizer_.line()) + ": " + message
+        );
     }
 
     tokenizer tokenizer_;

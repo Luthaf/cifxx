@@ -151,9 +151,22 @@ TEST_CASE("tokenizer") {
         CHECK(token.as_string() == "_string");
         CHECK(token.as_tag() == "_string");
 
-        CHECK_THROWS_AS(tokenizer("$string").next(), cifxx::error);
-        CHECK_THROWS_AS(tokenizer("[string").next(), cifxx::error);
-        CHECK_THROWS_AS(tokenizer("]string").next(), cifxx::error);
+        CHECK_THROWS_WITH(tokenizer("$string").next(),
+            "error on line 1: invalid string value '$string': "
+            "'$' is not allowed as the first character of unquoted strings"
+        );
+        CHECK_THROWS_WITH(tokenizer("\r[string").next(),
+            "error on line 2: invalid string value '[string': "
+            "'[' is not allowed as the first character of unquoted strings"
+        );
+        CHECK_THROWS_WITH(tokenizer("\n]string").next(),
+            "error on line 2: invalid string value ']string': "
+            "']' is not allowed as the first character of unquoted strings"
+        );
+        CHECK_THROWS_WITH(tokenizer("\n\r\n]string").next(),
+            "error on line 3: invalid string value ']string': "
+            "']' is not allowed as the first character of unquoted strings"
+        );
 
         token = tokenizer("'$string'").next();
         CHECK(token.kind() == token::String);
