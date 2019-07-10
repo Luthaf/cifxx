@@ -134,7 +134,7 @@ public:
             return multilines_string();
         } else {
             std::string content;
-            content.reserve(128);
+            content.reserve(32);
             // unquoted text or other values
             content.push_back(advance());
             while (!finished()) {
@@ -284,6 +284,7 @@ private:
         auto quote = advance();
         assert(quote == '\'' || quote == '"');
         std::string content;
+        content.reserve(64);
         while (!finished()) {
             if (check(quote) && next_is_whitespace()) {
                 advance();
@@ -298,7 +299,7 @@ private:
     /// Parse a multi-lines string token
     token multilines_string() {
         std::string content;
-        content.reserve(1024);
+        content.reserve(256);
         while (!finished()) {
             if (check(';')) {
                 if (previous_is_eol()) {
