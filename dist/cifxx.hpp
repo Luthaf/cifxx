@@ -744,6 +744,7 @@ private:
 #ifndef CIFXX_TOKENIZER_HPP
 #define CIFXX_TOKENIZER_HPP
 
+#include <cstdio>
 #include <algorithm>
 
 
@@ -813,6 +814,7 @@ public:
             return multilines_string();
         } else {
             std::string content;
+            content.reserve(128);
             // unquoted text or other values
             content.push_back(advance());
             while (!finished()) {
@@ -952,6 +954,7 @@ private:
     /// Parse a multi-lines string token
     token multilines_string() {
         std::string content;
+        content.reserve(1024);
         while (!finished()) {
             if (check(';')) {
                 if (previous_is_eol() && next_is_eol()) {
@@ -989,16 +992,11 @@ private:
         }
 
         // try to get a real
-        try {
-            std::size_t processed = 0;
-            number_t value = std::stod(number, &processed);
-            if (processed == number.length()) {
-                return token::number(value);
-            }
-        } catch (const std::invalid_argument&) {
-            // do nothing, this is not a real
-        } catch (const std::out_of_range&) {
-            throw error("real value " + content + " is too big for 64-bit float type");
+        number_t value = 0;
+        int processed = 0;
+        auto assigned = std::sscanf(number.c_str(), "%lf%n", &value, &processed);
+        if (assigned == 1 && number.size() == static_cast<size_t>(processed)) {
+            return token::number(value);
         }
 
         if (content.empty()) {
@@ -1011,7 +1009,7 @@ private:
         }
 
         // default to a string value
-        return token::string(content);
+        return token::string(std::move(content));
     }
 
     std::string input_;
@@ -1038,37 +1036,22 @@ public:
     parser(parser&&) = default;
     parser& operator=(parser&&) = default;
 
+    /// Parse a whole file and get all the data blocks inside
     std::vector<data> parse() {
-        std::vector<data> data_blocks;
+        std::vector<data> data;
         while (!finished()) {
-            data_blocks.push_back(data_block());
+            data.push_back(next());
         }
-        return data_blocks;
+        return data;
     }
 
-private:
+    /// Check whether we have read all the data in the file
     bool finished() const {
         return current_.kind() == token::Eof;
     }
 
-    /// Advance the current token by one and return the current token.
-    token advance() {
-        if (!finished()) {
-            auto other = tokenizer_.next();
-            std::swap(other, current_);
-            return other;
-        } else {
-            return current_;
-        }
-    }
-
-    /// Check if the current token have a given kind
-    bool check(token::Kind kind) const {
-        return current_.kind() == kind;
-    }
-
-    /// Read a single data block
-    data data_block() {
+    /// Read a single data block from the file
+    data next() {
         if (!check(token::Data)) {
             throw error("expected 'data_' at the begining of the data block, got " + current_.print());
         }
@@ -1089,6 +1072,23 @@ private:
         }
 
         return block;
+    }
+
+private:
+    /// Advance the current token by one and return the current token.
+    token advance() {
+        if (!finished()) {
+            auto other = tokenizer_.next();
+            std::swap(other, current_);
+            return other;
+        } else {
+            return current_;
+        }
+    }
+
+    /// Check if the current token have a given kind
+    bool check(token::Kind kind) const {
+        return current_.kind() == kind;
     }
 
     /// Read a single tag + value

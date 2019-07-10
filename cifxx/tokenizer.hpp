@@ -26,6 +26,7 @@
 #ifndef CIFXX_TOKENIZER_HPP
 #define CIFXX_TOKENIZER_HPP
 
+#include <cstdio>
 #include <algorithm>
 #include "token.hpp"
 
@@ -95,6 +96,7 @@ public:
             return multilines_string();
         } else {
             std::string content;
+            content.reserve(128);
             // unquoted text or other values
             content.push_back(advance());
             while (!finished()) {
@@ -234,6 +236,7 @@ private:
     /// Parse a multi-lines string token
     token multilines_string() {
         std::string content;
+        content.reserve(1024);
         while (!finished()) {
             if (check(';')) {
                 if (previous_is_eol() && next_is_eol()) {
@@ -271,16 +274,11 @@ private:
         }
 
         // try to get a real
-        try {
-            std::size_t processed = 0;
-            number_t value = std::stod(number, &processed);
-            if (processed == number.length()) {
-                return token::number(value);
-            }
-        } catch (const std::invalid_argument&) {
-            // do nothing, this is not a real
-        } catch (const std::out_of_range&) {
-            throw error("real value " + content + " is too big for 64-bit float type");
+        number_t value = 0;
+        int processed = 0;
+        auto assigned = std::sscanf(number.c_str(), "%lf%n", &value, &processed);
+        if (assigned == 1 && number.size() == static_cast<size_t>(processed)) {
+            return token::number(value);
         }
 
         if (content.empty()) {
@@ -293,7 +291,7 @@ private:
         }
 
         // default to a string value
-        return token::string(content);
+        return token::string(std::move(content));
     }
 
     std::string input_;
