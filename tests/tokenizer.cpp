@@ -134,15 +134,16 @@ TEST_CASE("tokenizer") {
         CHECK(token.kind() == token::String);
         CHECK(token.as_string() == "string\"but here");
 
-        token = tokenizer(";foo bar\n; bar\n;").next();
+        token = tokenizer(";foo bar\n bar\n;").next();
         CHECK(token.kind() == token::String);
         CHECK(token.as_string() == "foo bar\n bar\n");
 
-        token = tokenizer(";foo\n;bar\n;\n").next();
+        // missing final ';'
+        token = tokenizer(";foo\nbar\n\n").next();
         CHECK(token.kind() == token::String);
-        CHECK(token.as_string() == "foo\nbar\n");
+        CHECK(token.as_string() == "foo\nbar\n\n");
 
-        token = tokenizer("; foo\n;bar\n;").next();
+        token = tokenizer("; foo\nbar\n;").next();
         CHECK(token.kind() == token::String);
         CHECK(token.as_string() == " foo\nbar\n");
 
