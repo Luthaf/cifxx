@@ -88,6 +88,38 @@ public:
     explicit tokenizer(std::string input):
         input_(std::move(input)), current_(input_.begin()), end_(input_.end()) {}
 
+    tokenizer(const tokenizer& other): tokenizer("") {
+        *this = other;
+    }
+
+    tokenizer(tokenizer&& other): tokenizer("") {
+        *this = std::move(other);
+    }
+
+    tokenizer& operator=(const tokenizer& other) {
+        // compute current position as an offset
+        auto offset = other.current_ - other.input_.begin();
+        // copy the data
+        input_ = other.input_;
+        line_ = other.line_;
+        // Update the iterators
+        current_ = input_.begin() + offset;
+        end_ = input_.end();
+        return *this;
+    }
+
+    tokenizer& operator=(tokenizer&& other) {
+        // compute current position as an offset
+        auto offset = other.current_ - other.input_.begin();
+        // move the data
+        input_ = std::move(other.input_);
+        line_ = other.line_;
+        // Update the iterators
+        current_ = input_.begin() + offset;
+        end_ = input_.end();
+        return *this;
+    }
+
     /// Yield the next token
     token next() {
         skip_comment_and_whitespace();
