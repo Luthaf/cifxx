@@ -26,7 +26,10 @@
 #ifndef CIFXX_TOKEN_HPP
 #define CIFXX_TOKEN_HPP
 
+#include <new>
+#include <string>
 #include <cassert>
+
 #include "types.hpp"
 
 namespace cifxx {

@@ -26,10 +26,18 @@
 #ifndef CIFXX_PARSER_HPP
 #define CIFXX_PARSER_HPP
 
-#include <streambuf>
+#include <cassert>
+#include <cstddef>
+#include <memory>
+#include <string>
+#include <vector>
 #include <istream>
+#include <iterator>
 
+#include "types.hpp"
+#include "value.hpp"
 #include "data.hpp"
+#include "token.hpp"
 #include "tokenizer.hpp"
 
 namespace cifxx {
