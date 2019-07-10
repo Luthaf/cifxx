@@ -259,7 +259,7 @@ private:
         content.reserve(1024);
         while (!finished()) {
             if (check(';')) {
-                if (previous_is_eol() && next_is_eol()) {
+                if (previous_is_eol()) {
                     advance();
                     break;
                 }
