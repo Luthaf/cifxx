@@ -50,7 +50,6 @@ TEST_CASE("basic_data class") {
     CHECK(data.size() == 4);
 }
 
-
 TEST_CASE("data class") {
     auto data = cifxx::data("this_is_data");
     CHECK(data.name() == "this_is_data");
@@ -61,4 +60,22 @@ TEST_CASE("data class") {
     CHECK(data.find("_float") != data.end());
     CHECK(data.find("_float")->second.is_number());
     CHECK(data.find("_float")->second.as_number() == 32);
+
+    data.add_save("save_1", {});
+
+    auto save = basic_data();
+    save.emplace("_float", 55);
+    save.emplace("_string", "some more data");
+    data.add_save("save_2", std::move(save));
+
+    CHECK(data.save().size() == 2);
+    CHECK(data.save().find("save_1") != data.save().end());
+    CHECK(data.save().find("save_1")->second.empty());
+    CHECK(data.save().find("save_1")->second.size() == 0);
+
+    CHECK(data.save().find("save_2") != data.save().end());
+    auto& save_2 = data.save().find("save_2")->second;
+    CHECK(save_2.size() == 2);
+    CHECK(save_2.find("_float")->second.as_number() == 55);
+    CHECK(save_2.find("_string")->second.as_string() == "some more data");
 }

@@ -79,7 +79,7 @@ public:
             } else if (check(token::Loop)) {
                 read_loop(block);
             } else if (check(token::Save)) {
-                throw_error("save frame are not implemented");
+                read_save(block);
             } else {
                 throw_error(
                     "expected a tag, a loop or a save frame in data block, "
@@ -108,24 +108,49 @@ private:
         return current_.kind() == kind;
     }
 
+    /// Read a save frame
+    void read_save(data& block) {
+        auto name = advance().as_string();
+        auto save = basic_data();
+
+        while (!finished()) {
+            if (check(token::SaveEnd)) {
+                advance();
+                break;
+            } else if (check(token::Tag)) {
+                read_tag(save);
+            } else if (check(token::Loop)) {
+                read_loop(save);
+            } else if (check(token::Data)) {
+                throw_error("expected end of save frame, got a new data block");
+            } else if (check(token::Save)) {
+                throw_error("expected end of save frame, got a new save frame");
+            } else {
+                throw_error("expected a tag, a loop or a save frame in data block, got " + current_.print());
+            }
+        }
+
+        block.add_save(std::move(name), std::move(save));
+    }
+
     /// Read a single tag + value
-    void read_tag(data& block) {
+    void read_tag(basic_data& data) {
         auto tag_name = advance().as_tag();
 
         if (check(token::Dot) || check(token::QuestionMark)) {
             advance();
-            block.emplace(tag_name, value::missing());
+            data.emplace(tag_name, value::missing());
         } else if (check(token::Number)) {
-            block.emplace(tag_name, advance().as_number());
+            data.emplace(tag_name, advance().as_number());
         } else if (check(token::String)) {
-            block.emplace(tag_name, advance().as_string());
+            data.emplace(tag_name, advance().as_string());
         } else {
             throw_error("expected a value for tag " + tag_name + " , got " + current_.print());
         }
     }
 
     /// Read a loop section
-    void read_loop(data& block) {
+    void read_loop(basic_data& data) {
         auto loop = advance();
         assert(loop.kind() == token::Loop);
 
@@ -159,7 +184,7 @@ private:
         }
 
         for (auto it: values) {
-            block.emplace(std::move(it.first), std::move(it.second));
+            data.emplace(std::move(it.first), std::move(it.second));
         }
     }
 

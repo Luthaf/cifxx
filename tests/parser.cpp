@@ -4,9 +4,9 @@
 #include "cifxx/parser.hpp"
 using namespace cifxx;
 
-static value get(const data& block, const std::string& key) {
-    auto it = block.find(key);
-    if (it != block.end()) {
+static value get(const basic_data& data, const std::string& key) {
+    auto it = data.find(key);
+    if (it != data.end()) {
         return it->second;
     } else {
         throw cifxx::error("missing data for key " + key);
@@ -20,6 +20,7 @@ TEST_CASE("Parse files") {
         REQUIRE(blocks.size() == 1);
 
         CHECK(blocks[0].name() == "minimal");
+        CHECK(blocks[0].save().empty());
     }
 
     SECTION("multiple data blocks") {
@@ -28,9 +29,11 @@ TEST_CASE("Parse files") {
         REQUIRE(blocks.size() == 2);
 
         CHECK(blocks[0].name() == "first");
+        CHECK(blocks[0].save().empty());
         CHECK(get(blocks[0], "_tag1").as_number() == 1);
 
         CHECK(blocks[1].name() == "second");
+        CHECK(blocks[1].save().empty());
         CHECK(get(blocks[1], "_tag2").as_number() == 3);
     }
 
@@ -81,11 +84,6 @@ TEST_CASE("Invalid CIF files") {
     parser = cifxx::parser(std::ifstream(DATADIR "bad/global.cif"));
     CHECK_THROWS_WITH(parser.parse(),
         "error on line 3: expected 'data_' at the begining of the data block, got 'global_'"
-    );
-
-    parser = cifxx::parser(std::ifstream(DATADIR "bad/save.cif"));
-    CHECK_THROWS_WITH(parser.parse(),
-        "error on line 7: save frame are not implemented"
     );
 }
 
@@ -215,5 +213,55 @@ TEST_CASE("Problematic CIF files") {
         environment = get(block, "_sm_atomic_environment_type").as_vector();
         CHECK(environment.size() == 1);
         CHECK(environment[0].is_missing());
+    }
+}
+
+#include <iostream>
+
+TEST_CASE("Support for save save frames") {
+    SECTION("basic file") {
+        auto parser = cifxx::parser(std::ifstream(DATADIR "save.cif"));
+        auto blocks = parser.parse();
+
+        REQUIRE(blocks.size() == 1);
+        CHECK(blocks[0].name() == "sav");
+        CHECK(get(blocks[0], "_tag1").as_number() == 2.0);
+
+        CHECK(blocks[0].save().size() == 1);
+        auto it = blocks[0].save().find("test");
+        REQUIRE(it != blocks[0].save().end());
+
+        auto& save = it->second;
+        CHECK(get(save, "_tag2").as_string() == "Hey");
+        CHECK(get(save, "_tag3").as_number() == 45.245);
+        CHECK(get(save, "_looped").as_vector().size() == 4);
+    }
+
+    SECTION("Actual CIF dictionary: PDBX mmCIF v5.0") {
+        std::ifstream file(DATADIR "mmcif_pdbx_v50.dic");
+        auto blocks = parser(file).parse();
+        REQUIRE(blocks.size() == 1);
+        auto block = blocks[0];
+
+        CHECK(block.name() == "mmcif_pdbx.dic");
+        CHECK(block.save().size() == 6725);
+
+        auto it = block.save().find("pdbx_nmr_sample_details");
+        CHECK(it != block.save().end());
+
+        // Weird case with CIF formated data inside a string ...
+        auto& data = it->second;
+        auto category_examples = get(data, "_category_examples.case").as_vector();
+        CHECK(category_examples.size() == 1);
+        auto expected = R"(
+ loop_
+ _pdbx_nmr_sample_details.solution_id
+ _pdbx_nmr_sample_details.solvent_system
+ _pdbx_nmr_sample_details.contents
+ 1 MCP-1 '2 mM U-15N,13C, H2O 90 %, D2O 10 %'
+ 2 MCP-1 '1 mM U-50% 15N, MCP-1 1 mM U-50% 13C, H2O 90 %, D2O 10 %'
+ 3 MCP-1 '2 mM U-15N, H2O 90 %, D2O 10 %'
+)";
+        CHECK(category_examples[0].as_string() == expected);
     }
 }

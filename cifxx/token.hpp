@@ -64,6 +64,7 @@ public:
         String,         // a string value
         Data,           // data frame header
         Save,           // save frame header
+        SaveEnd,        // `save_` literal, ends a save block
         QuestionMark,   // `?` literal
         Dot,            // `.` literal
     };
@@ -78,7 +79,7 @@ public:
         return token(Loop);
     }
 
-    /// Create a new token representing the `save_` literal
+    /// Create a new token representing the `stop_` literal
     static token stop() {
         return token(Stop);
     }
@@ -113,6 +114,11 @@ public:
         return token(Save, name);
     }
 
+    /// Create a new token representing the `save_` literal
+    static token save_end() {
+        return token(SaveEnd);
+    }
+
     /// Create a new token representing a string `value`
     static token string(string_t value) {
         return token(String, value);
@@ -143,11 +149,12 @@ public:
         case Number:
             new (&this->number_) number_t(other.number_);
             break;
+        case Dot:
         case Eof:
         case Loop:
         case Stop:
         case Global:
-        case Dot:
+        case SaveEnd:
         case QuestionMark:
             break; // nothing to do
         }
@@ -173,11 +180,12 @@ public:
         case Number:
             new (&this->number_) number_t(std::move(other.number_));
             break;
+        case Dot:
         case Eof:
         case Loop:
         case Stop:
         case Global:
-        case Dot:
+        case SaveEnd:
         case QuestionMark:
             break; // nothing to do
         }
@@ -193,12 +201,13 @@ public:
         case Tag:
             this->string_.~string_t();
             break;
+        case Dot:
         case Eof:
         case Loop:
         case Stop:
         case Global:
         case Number:
-        case Dot:
+        case SaveEnd:
         case QuestionMark:
             break; // nothing to do
         }
@@ -244,6 +253,8 @@ public:
             return this->as_string();
         case Save:
             return "save_" + this->as_string();
+        case SaveEnd:
+            return "save_";
         case Data:
             return "data_" + this->as_string();
         case Eof:

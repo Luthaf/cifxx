@@ -5,12 +5,12 @@
 Cifxx is a CIF files parser written in modern C++ (C++11), in an single header,
 distributed under the 3 clauses BSD license.
 
-It parses files that follow the CIF/STAR grammar, as described in
+It parses files that follow the CIF grammar, as described in
 https://www.iucr.org/resources/cif/spec/version1.1/cifsyntax. This file format
 is used by the [RSCB PDB archive](https://www.rcsb.org/) for description of
-protein. It originates from and is also used by the crystallographic community,
-where is is used to store atomic coordinates with symmetry in a given space
-group.
+protein in the PDBx/mmCIF format. It originates from and is also used by the
+crystallographic community, where is is used to store atomic coordinates with
+symmetry in a given space group.
 
 Cifxx does not perform any validation of any sort, or coordinate generation from
 the symmetry group: this is left to the application.
@@ -20,6 +20,11 @@ the symmetry group: this is left to the application.
 - No dependencies outside of the standard library
 - Single header, easy to use
 - Parses all valid CIF files (except for bugs. Please report any you find!)
+    - Handles all of CIF 1.1 specification
+    - Also handles `save_` frames, which allows to read dictionary files
+    - Does not handle `global_` and `stop_` keywords from STAR, since they are
+      not needed for CIF or dictionary files. Let me know if this would be
+      useful to you!
 - Liberal license, usable in commercial applications
 
 # Installation

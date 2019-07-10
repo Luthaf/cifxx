@@ -27,6 +27,7 @@
 #define CIFXX_DATA_HPP
 
 #include <map>
+
 #include "value.hpp"
 #include "token.hpp"
 
@@ -116,8 +117,19 @@ public:
         return name_;
     }
 
+    /// Add a `save` block with the given `name` in this data block
+    void add_save(std::string name, basic_data save) {
+        save_.emplace(std::move(name), std::move(save));
+    }
+
+    /// Get the save frames in this data block
+    const std::map<std::string, basic_data>& save() const {
+        return save_;
+    }
+
 private:
     std::string name_;
+    std::map<std::string, basic_data> save_;
 };
 
 }
