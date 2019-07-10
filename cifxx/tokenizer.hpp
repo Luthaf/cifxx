@@ -27,7 +27,13 @@
 #define CIFXX_TOKENIZER_HPP
 
 #include <cstdio>
+#include <cctype>
+#include <cassert>
+
+#include <string>
 #include <algorithm>
+
+#include "types.hpp"
 #include "token.hpp"
 
 namespace cifxx {

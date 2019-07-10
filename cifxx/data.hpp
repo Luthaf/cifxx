@@ -27,7 +27,10 @@
 #define CIFXX_DATA_HPP
 
 #include <map>
+#include <string>
+#include <utility>
 
+#include "types.hpp"
 #include "value.hpp"
 #include "token.hpp"
 

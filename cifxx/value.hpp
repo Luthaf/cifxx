@@ -26,6 +26,10 @@
 #ifndef CIFXX_VALUE_HPP
 #define CIFXX_VALUE_HPP
 
+#include <new>
+#include <string>
+#include <utility>
+
 #include "types.hpp"
 
 namespace cifxx {
