@@ -3,8 +3,7 @@ add_library(catch STATIC catch/catch.cpp)
 function(cifxx_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
     add_executable(${_name_} ${_file_})
-    target_include_directories(${_name_} PRIVATE ${PROJECT_SOURCE_DIR})
-    target_link_libraries(${_name_} catch)
+    target_link_libraries(${_name_} catch cifxx)
     add_test(NAME ${_name_}
         COMMAND ${_name_}
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
