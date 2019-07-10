@@ -116,7 +116,11 @@ public:
             if (begining == "data_") {
                 return token::data(content.substr(5));
             } else if (begining == "save_") {
-                return token::save(content.substr(5));
+                if (content.size() == 5) {
+                    return token::save_end();
+                } else {
+                    return token::save(content.substr(5));
+                }
             } else if (begining == "loop_") {
                 return token::loop();
             } else if (begining == "stop_") {
