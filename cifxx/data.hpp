@@ -32,33 +32,26 @@
 
 namespace cifxx {
 
-/// A data block in a CIF file
-class data final {
+/// Basic data storage for both data blocks and save blocks
+class basic_data {
 public:
-    using iterator = std::map<std::string, value>::iterator;
-    using const_iterator = std::map<std::string, value>::const_iterator;
+    using iterator = std::map<std::string, value>::const_iterator;
 
-    /// Create a new data block with the given `name`
-    data(std::string name): name_(std::move(name)), data_() {}
-    data(const data&) = default;
-    data(data&&) = default;
-    data& operator=(const data&) = default;
-    data& operator=(data&&) = default;
+    basic_data() = default;
+    basic_data(const basic_data&) = default;
+    basic_data(basic_data&&) = default;
+    basic_data& operator=(const basic_data&) = default;
+    basic_data& operator=(basic_data&&) = default;
 
-    /// Get the name of this data block
-    const std::string& name() const {
-        return name_;
-    }
-
-    /// Lookup the given `key` in this block.
+    /// Lookup the given `key` in this data set.
     ///
     /// @returns an iterator pointing to the key/value pair if the key is
     ///          present in the data, or `data::end()` if the key is not present.
-    const_iterator find(const std::string& key) const {
+    iterator find(const std::string& key) const {
         return data_.find(key);
     }
 
-    /// Find and return the given `key` in this block.
+    /// Find and return the given `key` in this data set.
     ///
     /// @throws cifxx::error if their is no value associated with `key`.
     /// @returns the value associated with `key`.
@@ -70,33 +63,61 @@ public:
         return it->second;
     }
 
-    /// Insert a value in the data block, associated with the given `tag`.
+    /// Insert a value in the data set, associated with the given `tag`.
     ///
     /// If there is already a value associated with this key, no insertion is
     /// performed, and the return value is `(iterator, false)` where `iterator`
     /// is pointing to the data entry that prevented insertion. If the insertion
     /// took place, the return value is `(iterator, true)` where `iterator`
     /// is pointing to the newly inserted data.
-    std::pair<iterator, bool> insert(std::string tag, value val) {
+    std::pair<iterator, bool> emplace(std::string tag, value val) {
         if (!is_tag_name(tag)) {
             throw error(tag + " is not a valid data tag name");
         }
         return data_.emplace(std::move(tag), std::move(val));
     }
 
-    /// Get the first entry of this data block
-    const_iterator begin() const {
+    /// Get the first entry of this data set
+    iterator begin() const {
         return data_.begin();
     }
 
-    /// Get the end of this data block
-    const_iterator end() const {
+    /// Get the end of this data set
+    iterator end() const {
         return data_.end();
+    }
+
+    /// Get the number of items in this data set
+    size_t size() const {
+        return data_.size();
+    }
+
+    /// Check if this data set is empty
+    bool empty() const {
+        return data_.empty();
+    }
+
+private:
+    std::map<std::string, value> data_;
+};
+
+/// A data block in a CIF file
+class data final: public basic_data {
+public:
+    /// Create a new data block with the given `name`
+    data(std::string name): name_(std::move(name)) {}
+    data(const data&) = default;
+    data(data&&) = default;
+    data& operator=(const data&) = default;
+    data& operator=(data&&) = default;
+
+    /// Get the name of this data block
+    const std::string& name() const {
+        return name_;
     }
 
 private:
     std::string name_;
-    std::map<std::string, value> data_;
 };
 
 }

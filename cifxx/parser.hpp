@@ -114,11 +114,11 @@ private:
 
         if (check(token::Dot) || check(token::QuestionMark)) {
             advance();
-            block.insert(tag_name, value::missing());
+            block.emplace(tag_name, value::missing());
         } else if (check(token::Number)) {
-            block.insert(tag_name, advance().as_number());
+            block.emplace(tag_name, advance().as_number());
         } else if (check(token::String)) {
-            block.insert(tag_name, advance().as_string());
+            block.emplace(tag_name, advance().as_string());
         } else {
             throw_error("expected a value for tag " + tag_name + " , got " + current_.print());
         }
@@ -159,7 +159,7 @@ private:
         }
 
         for (auto it: values) {
-            block.insert(std::move(it.first), std::move(it.second));
+            block.emplace(std::move(it.first), std::move(it.second));
         }
     }
 
