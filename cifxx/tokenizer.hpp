@@ -59,6 +59,11 @@ inline bool is_digit(char c) {
     return '0' <= c && c <= '9';
 }
 
+/// Check if a given char can start a number
+inline bool is_number_start(char c) {
+    return is_digit(c) || c == '-' || c == '+' || c == '.';
+}
+
 /// An helper class for the tokenizer, checking if a given char matches a
 /// pattern
 class char_checker {
@@ -120,8 +125,12 @@ public:
         return *this;
     }
 
+    // disable calling next on rvalues, since the token data will point to
+    // deallocated memory
+    token next() && = delete;
+
     /// Yield the next token
-    token next() {
+    token next() & {
         skip_comment_and_whitespace();
         if (finished()) {
             return token::eof();
@@ -133,14 +142,13 @@ public:
             advance();
             return multilines_string();
         } else {
-            std::string content;
-            content.reserve(32);
+            auto start = current_.base();
+            size_t count = 0;
             // unquoted text or other values
-            content.push_back(advance());
             while (!finished()) {
                 if (check(is_non_blank_char)) {
-                    content.push_back(advance());
-                    continue;
+                    advance();
+                    count++;
                 } else {
                     // we found a whitespace
                     break;
@@ -149,7 +157,8 @@ public:
 
             // check for reserved words, we only need to do this with
             // unquoted strings
-            auto begining = content.substr(0, 5);
+            auto content = string_view_t(start, count);
+            auto begining = content.substr(0, 5).to_string();
             std::transform(begining.begin(), begining.end(), begining.begin(), ::tolower);
             if (begining == "data_") {
                 return token::data(content.substr(5));
@@ -164,15 +173,15 @@ public:
             } else if (begining == "stop_") {
                 return token::stop();
             } else if (begining == "globa") {
-                begining = content;
+                begining = content.to_string();
                 std::transform(begining.begin(), begining.end(), begining.begin(), ::tolower);
                 if (begining == "global_") {
                     return token::global();
                 } else {
-                    return token_for_value(std::move(content));
+                    return token_for_value(content);
                 }
             } else {
-                return token_for_value(std::move(content));
+                return token_for_value(content);
             }
         }
     }
@@ -283,23 +292,24 @@ private:
     token string() {
         auto quote = advance();
         assert(quote == '\'' || quote == '"');
-        std::string content;
-        content.reserve(64);
+        auto start = current_.base();
+        size_t count = 0;
         while (!finished()) {
             if (check(quote) && next_is_whitespace()) {
                 advance();
                 break;
             } else {
-                content.push_back(advance());
+                advance();
+                count++;
             }
         }
-        return token::string(std::move(content));
+        return token::string(string_view_t(start, count));
     }
 
     /// Parse a multi-lines string token
     token multilines_string() {
-        std::string content;
-        content.reserve(256);
+        auto start = current_.base();
+        size_t count = 0;
         while (!finished()) {
             if (check(';')) {
                 if (previous_is_eol()) {
@@ -308,14 +318,15 @@ private:
                 }
                 advance();
             } else {
-                content.push_back(advance());
+                advance();
+                count++;
             }
         }
-        return token::string(std::move(content));
+        return token::string(string_view_t(start, count));
     }
 
     /// Parse a token from the given `content`
-    token token_for_value(std::string content) const {
+    token token_for_value(string_view_t content) const {
         if (content == "?") {
             return token::question_mark();
         } else if (content == ".") {
@@ -326,29 +337,32 @@ private:
             return token::tag(content);
         }
 
-        std::string number = content;
-        // check if we have the `number(precision)` form
-        if (content.length() >= 4) {
-            auto last = content.length() - 1;
-            auto lparen = content.rfind('(');
-            if (lparen != std::string::npos && content[last] == ')') {
-                number = content.substr(0, lparen) + content.substr(lparen + 1, last - lparen - 1);
+        if (!content.empty() && is_number_start(content[0])) {
+            auto number = content.to_string();
+            // check if we have the `number(precision)` form
+            if (number.length() >= 4) {
+                auto last = content.length() - 1;
+                auto lparen = content.rfind('(');
+                if (lparen != std::string::npos && content[last] == ')') {
+                    number = number.substr(0, lparen) + number.substr(lparen + 1, last - lparen - 1);
+                }
             }
-        }
 
-        // try to get a real
-        number_t value = 0;
-        int processed = 0;
-        auto assigned = std::sscanf(number.c_str(), "%lf%n", &value, &processed);
-        if (assigned == 1 && number.size() == static_cast<size_t>(processed)) {
-            return token::number(value);
+            number_t value = 0;
+            int processed = 0;
+            auto assigned = std::sscanf(number.c_str(), "%lf%n", &value, &processed);
+            // Only return a number if we could parse one and if it spans the
+            // whole string (i.e. not parsing 235 out of "235fgh").
+            if (assigned == 1 && number.size() == static_cast<size_t>(processed)) {
+                return token::number(value);
+            }
         }
 
         if (content.empty()) {
             throw_error("invalid empty unquoted string value");
         } else if (content[0] == '$' || content[0] == '[' || content[0] == ']') {
             throw_error(
-                "invalid string value '" + content + "': '" + content[0] +
+                "invalid string value '" + content.to_string() + "': '" + content[0] +
                 "' is not allowed as the first character of unquoted strings"
             );
         }
@@ -363,7 +377,7 @@ private:
         );
     }
 
-    std::string input_;
+    string_t input_;
     size_t line_ = 1;
 
     string_t::const_iterator current_;

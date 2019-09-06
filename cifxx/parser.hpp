@@ -59,7 +59,7 @@ public:
     std::vector<data> parse() {
         std::vector<data> data;
         while (!finished()) {
-            data.push_back(next());
+            data.emplace_back(next());
         }
         return data;
     }
@@ -77,7 +77,7 @@ public:
                 "got '" + current_.print() + "'"
             );
         }
-        auto block = data(advance().as_string());
+        auto block = data(advance().as_str_view().to_string());
 
         while (!finished()) {
             if (check(token::Data)) {
@@ -118,7 +118,7 @@ private:
 
     /// Read a save frame
     void read_save(data& block) {
-        auto name = advance().as_string();
+        auto name = advance().as_str_view();
         auto save = basic_data();
 
         while (!finished()) {
@@ -138,7 +138,7 @@ private:
             }
         }
 
-        block.add_save(std::move(name), std::move(save));
+        block.add_save(name.to_string(), std::move(save));
     }
 
     /// Read a single tag + value
@@ -147,13 +147,13 @@ private:
 
         if (check(token::Dot) || check(token::QuestionMark)) {
             advance();
-            data.emplace(tag_name, value::missing());
+            data.emplace(tag_name.to_string(), value::missing());
         } else if (check(token::Number)) {
-            data.emplace(tag_name, advance().as_number());
+            data.emplace(tag_name.to_string(), advance().as_number());
         } else if (check(token::String)) {
-            data.emplace(tag_name, advance().as_string());
+            data.emplace(tag_name.to_string(), advance().as_str_view().to_string());
         } else {
-            throw_error("expected a value for tag " + tag_name + " , got " + current_.print());
+            throw_error("expected a value for tag " + tag_name.to_string() + " , got " + current_.print());
         }
     }
 
@@ -164,7 +164,7 @@ private:
 
         std::vector<std::pair<std::string, vector_t>> values;
         while (check(token::Tag)) {
-            values.push_back({advance().as_tag(), vector_t()});
+            values.emplace_back(advance().as_tag().to_string(), vector_t());
         }
 
         size_t current = 0;
@@ -172,11 +172,11 @@ private:
             size_t index = current % values.size();
             if (check(token::Dot) || check(token::QuestionMark)) {
                 advance();
-                values[index].second.push_back(value::missing());
+                values[index].second.emplace_back(value::missing());
             } else if (check(token::Number)) {
-                values[index].second.push_back(advance().as_number());
+                values[index].second.emplace_back(advance().as_number());
             } else if (check(token::String)) {
-                values[index].second.push_back(advance().as_string());
+                values[index].second.emplace_back(advance().as_str_view().to_string());
             } else {
                 break;
             }

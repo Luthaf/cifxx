@@ -30,12 +30,16 @@
 #include <vector>
 #include <stdexcept>
 
+#include "external/string_view.hpp"
+
 namespace cifxx {
 
 class value;
 
 /// String type used for string values
 using string_t = std::string;
+/// String-view type used in tokenizer/parser
+using string_view_t = nonstd::string_view;
 /// Floating point type used for numeric values
 using number_t = double;
 /// Vector type used for vector values

@@ -42,7 +42,7 @@ inline bool is_non_blank_char(char c) {
 /// Check if `name` is a CIF tag name.
 ///
 ///     <tag_name> = '_' {<non_blank_char>}+
-inline bool is_tag_name(const std::string& name) {
+inline bool is_tag_name(string_view_t name) {
     if (name.length() < 2) return false;
     if (name[0] != '_') return false;
     auto begin = name.begin();
@@ -108,14 +108,26 @@ public:
     }
 
     /// Create a new token representing a data frame header with this `name`
-    static token data(string_t name) {
+    static token data(string_view_t name) {
         return token(Data, name);
     }
+    // overload resolution helper
+    static token data(const char* name) {
+        return token::data(string_view_t(name));
+    }
+    // disable calling this funtion on std::string temporaries
+    static token data(string_t&& name) = delete;
 
     /// Create a new token representing a save frame header with this `name`
-    static token save(string_t name) {
+    static token save(string_view_t name) {
         return token(Save, name);
     }
+    // overload resolution helper
+    static token save(const char* name) {
+        return token::save(string_view_t(name));
+    }
+    // disable calling this funtion on std::string temporaries
+    static token save(string_t&& name) = delete;
 
     /// Create a new token representing the `save_` literal
     static token save_end() {
@@ -123,15 +135,27 @@ public:
     }
 
     /// Create a new token representing a string `value`
-    static token string(string_t value) {
-        return token(String, value);
+    static token string(string_view_t value) {
+        return token(String, std::move(value));
     }
+    // overload resolution helper
+    static token string(const char* value) {
+        return token::string(string_view_t(value));
+    }
+    // disable calling this funtion on std::string temporaries
+    static token string(string_t&& value) = delete;
 
     /// Create a new token representing a tag with the given `name`
-    static token tag(string_t name) {
+    static token tag(string_view_t name) {
         assert(is_tag_name(name));
-        return token(Tag, name);
+        return token(Tag, std::move(name));
     }
+    // overload resolution helper
+    static token tag(const char* name) {
+        return token::tag(string_view_t(name));
+    }
+    // disable calling this funtion on std::string temporaries
+    static token tag(string_t&& name) = delete;
 
     /// The copy constructor for tokens
     token(const token& other): token(Eof) {
@@ -147,7 +171,7 @@ public:
         case Save:
         case Data:
         case Tag:
-            new (&this->string_) string_t(other.string_);
+            new (&this->string_) string_view_t(other.string_);
             break;
         case Number:
             new (&this->number_) number_t(other.number_);
@@ -178,7 +202,7 @@ public:
         case Save:
         case Data:
         case Tag:
-            new (&this->string_) string_t(std::move(other.string_));
+            new (&this->string_) string_view_t(std::move(other.string_));
             break;
         case Number:
             new (&this->number_) number_t(std::move(other.number_));
@@ -197,23 +221,7 @@ public:
 
     /// The destructor for tokens
     ~token() {
-        switch (this->kind_) {
-        case String:
-        case Save:
-        case Data:
-        case Tag:
-            this->string_.~string_t();
-            break;
-        case Dot:
-        case Eof:
-        case Loop:
-        case Stop:
-        case Global:
-        case Number:
-        case SaveEnd:
-        case QuestionMark:
-            break; // nothing to do
-        }
+        // nothing to do
     }
 
     /// Get the token kind
@@ -223,7 +231,7 @@ public:
 
     /// Get the string data in this token, if the token has the `String`,
     /// `Data`, `Save` or `Tag` kind.
-    const string_t& as_string() const {
+    string_view_t as_str_view() const {
         if (kind_ == String || kind_ == Data || kind_ == Save || kind_ == Tag) {
             return string_;
         } else {
@@ -232,7 +240,7 @@ public:
     }
 
     /// Get the tag name of this token, if the token has the `Tag` kind.
-    const string_t& as_tag() const {
+    string_view_t as_tag() const {
         if (kind_ == Tag) {
             return string_;
         } else {
@@ -253,13 +261,13 @@ public:
         switch (this->kind_) {
         case String:
         case Tag:
-            return this->as_string();
+            return this->as_str_view().to_string();
         case Save:
-            return "save_" + this->as_string();
+            return "save_" + this->as_str_view().to_string();
         case SaveEnd:
             return "save_";
         case Data:
-            return "data_" + this->as_string();
+            return "data_" + this->as_str_view().to_string();
         case Eof:
             return "<eof>";
         case Loop:
@@ -288,7 +296,7 @@ private:
     }
 
     /// Constructor for tokens with string data attached
-    token(Kind kind, string_t string): kind_(kind), string_(std::move(string)) {
+    token(Kind kind, string_view_t string): kind_(kind), string_(string) {
         assert(kind == String || kind == Data || kind == Save || kind == Tag);
     }
 
@@ -297,7 +305,10 @@ private:
 
     Kind kind_;
     union {
-        string_t string_;
+        // Holding a string_view as a data-member is usually not recomended.
+        // It is fine here since the corresponding string will be kept alive by
+        // the parser.
+        string_view_t string_;
         number_t number_;
     };
 };
