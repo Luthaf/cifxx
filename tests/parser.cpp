@@ -216,8 +216,6 @@ TEST_CASE("Problematic CIF files") {
     }
 }
 
-#include <iostream>
-
 TEST_CASE("Support for save save frames") {
     SECTION("basic file") {
         auto parser = cifxx::parser(std::ifstream(DATADIR "save.cif"));
