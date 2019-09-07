@@ -80,4 +80,7 @@ else()
     # Not everyone is as smart as clang for code reachability
     add_warning_flag("-Wno-covered-switch-default")
     add_warning_flag("-Wno-unreachable-code-break")
+
+    # Other warnings to disable
+    add_warning_flag("-Wno-catch-value")
 endif()
